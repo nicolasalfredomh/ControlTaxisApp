@@ -16,21 +16,19 @@ namespace ControlTaxisApp.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public IActionResult Registro()
-        {
-            return View();
-        }
+        [HttpGet] // Esto es para ver la página
+        public IActionResult Registro() { return View(); }
 
-        [HttpPost]
+        [HttpPost] // ESTO ES VITAL para que el botón funcione
         public IActionResult Registro(Usuario nuevoUsuario)
         {
+            // Pon un "punto de interrupción" (breakpoint) aquí en Visual Studio
+            // para ver si al dar clic en el botón, el código se detiene aquí.
             if (ModelState.IsValid)
             {
-                // Aquí podrías agregar lógica para encriptar la contraseña si la usas
                 _context.Usuarios.Add(nuevoUsuario);
                 _context.SaveChanges();
-                return RedirectToAction("Login"); // Redirige al login tras registrarse
+                return RedirectToAction("Login");
             }
             return View(nuevoUsuario);
         }
