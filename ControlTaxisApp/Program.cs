@@ -1,24 +1,32 @@
-using Microsoft.EntityFrameworkCore;
 using ControlTaxisApp.Models;
-using OfficeOpenXml; // Asegúrate de incluir este namespace
+using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- CONFIGURACIÓN PARA EPPLUS 5.8.14 ---
-// Esta configuración es necesaria para versiones 5.x de EPPlus
+// --- 1. CONFIGURACIÓN DINÁMICA DE SQLite ---
+string dbPath;
+if (builder.Environment.IsProduction())
+{
+    // Ruta en el contenedor de Fly.io (donde está el volumen)
+    dbPath = "/app/data/ControlTaxis.db";
+}
+else
+{
+    // Ruta en tu PC local
+    dbPath = "ControlTaxis.db";
+}
+
+// REGISTRO ÚNICO DEL CONTEXTO DE BASE DE DATOS
+builder.Services.AddDbContext<ControlTaxisContext>(options =>
+    options.UseSqlite($"Data Source={dbPath}"));
+
+// --- 2. CONFIGURACIÓN DE EPPLUS ---
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-// 1. REGISTRO DEL CONTEXTO DE LA BASE DE DATOS
-//builder.Services.AddDbContext<ControlTaxisContext>(options =>
-//options.UseSqlServer("Server=Daniel\\SQLEXPRESS;Database=ControlTaxisDB;Trusted_Connection=True;TrustServerCertificate=True"));
-
-builder.Services.AddDbContext<ControlTaxisContext>(options =>
-    options.UseSqlite("Data Source=ControlTaxis.db"));
-
-// 2. AGREGAR SERVICIOS PARA CONTROLADORES Y VISTAS (MVC)
+// --- 3. SERVICIOS MVC Y AUTENTICACIÓN ---
 builder.Services.AddControllersWithViews();
 
-// 3. CONFIGURACIÓN DE LA AUTENTICACIÓN POR COOKIES
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options =>
     {
@@ -27,8 +35,20 @@ builder.Services.AddAuthentication("CookieAuth")
 
 var app = builder.Build();
 
-// 4. CONFIGURACIÓN DEL ENTORNO DE EJECUCIÓN (Pipeline HTTP)
-if (!app.Environment.IsDevelopment())
+// --- 4. CREACIÓN AUTOMÁTICA DE LA BASE DE DATOS ---
+// Esto asegura que si el archivo .db no existe en la carpeta /app/data, se cree al iniciar
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ControlTaxisContext>();
+    db.Database.EnsureCreated();
+}
+
+// --- 5. PIPELINE HTTP ---
+if (!app.Environment.IsProduction()) // Usamos !IsProduction para ver errores en desarrollo
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -42,7 +62,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 5. RUTA POR DEFECTO
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Acceso}/{action=Login}/{id?}");
