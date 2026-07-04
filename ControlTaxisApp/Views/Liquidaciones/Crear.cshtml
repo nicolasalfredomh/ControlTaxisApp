@@ -1,0 +1,81 @@
+﻿@model ControlTaxisApp.Models.LiquidacionDiaria
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nueva Liquidación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container my-5" style="max-width: 600px;">
+        <div class="card shadow-sm border-start border-success border-5">
+            <div class="card-body p-4">
+                <h3 class="fw-bold text-secondary mb-1">
+                    <i class="fa-solid fa-plus text-success me-2"></i> Registrar Liquidación
+                </h3>
+                <hr />
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                <form asp-action="Crear" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Vehículo</label>
+                            <select asp-for="VehiculoId" class="form-select" asp-items="ViewBag.IdVehiculo">
+                                <option value="">Seleccione un vehículo...</option>
+                            </select>
+                            <span asp-validation-for="VehiculoId" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fecha de Labor</label>
+                            <input asp-for="Fecha" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Producción ($)</label>
+                            <input asp-for="Producido" id="producido" type="number" class="form-control" oninput="calcularSaldo()" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Gastos ($)</label>
+                            <input asp-for="Gastos" id="gastos" type="number" class="form-control" oninput="calcularSaldo()" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Ahorro ($)</label>
+                            <input asp-for="Ahorro" type="number" class="form-control" placeholder="0" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Saldo Final ($)</label>
+                            <input type="text" id="saldoDisplay" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Guardar Liquidación</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calcularSaldo() {
+            const prod = parseFloat(document.getElementById('producido').value) || 0;
+            const gast = parseFloat(document.getElementById('gastos').value) || 0;
+            const saldo = prod - gast;
+
+            document.getElementById('saldoDisplay').value = saldo.toFixed(2);
+        }
+    </script>
+
+</body>
+</html>

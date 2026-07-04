@@ -1,0 +1,49 @@
+﻿@model ControlTaxisApp.Models.Usuario
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Control Taxis</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4">Iniciar Sesión</h3>
+
+                        <form action="/Acceso/Login" method="post">
+
+                            <div class="form-group mb-3">
+                                <label class="form-label">Usuario</label>
+                                <input type="text" name="nombreUsuario" class="form-control" required autocomplete="off" />
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="form-label">Contraseña</label>
+                                <input type="password" name="clave" class="form-control" required />
+                            </div>
+
+                            @if (ViewBag.Error != null)
+                            {
+                                <div class="alert alert-danger text-center p-2">
+                                    @ViewBag.Error
+                                </div>
+                            }
+
+                            <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

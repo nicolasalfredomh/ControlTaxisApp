@@ -1,0 +1,50 @@
+﻿@model ControlTaxisApp.Models.Vehiculo
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrar Vehículo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container my-5" style="max-width: 600px;">
+        <div class="card shadow-sm border-start border-primary border-5 mb-4">
+            <div class="card-body p-4">
+                <h3 class="fw-bold text-secondary mb-1">
+                    <i class="fa-solid fa-taxi text-primary me-2"></i> Registrar Vehículo
+                </h3>
+                <p class="text-muted small">Ingresa la información del nuevo taxi para darlo de alta en el sistema.</p>
+                <hr />
+
+                <form asp-action="Crear" method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Placa del Vehículo</label>
+                        <input asp-for="Placa" type="text" class="form-control" required placeholder="Ej: VDR817" style="text-transform: uppercase;" />
+                        <span asp-validation-for="Placa" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted">Modelo / Marca</label>
+                        <input asp-for="Modelo" type="text" class="form-control" required placeholder="Ej: Hyundai Accent 2024" />
+                        <span asp-validation-for="Modelo" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary btn-sm">Cancelar</a>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-floppy-disk me-1"></i> Guardar Vehículo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

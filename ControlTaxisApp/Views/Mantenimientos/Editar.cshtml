@@ -1,0 +1,76 @@
+﻿@model ControlTaxisApp.Models.Mantenimiento
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light p-5">
+    <div class="container" style="max-width: 600px;">
+        <div class="card shadow p-4 border-start border-primary border-5">
+            <h3><i class="fa-solid fa-pen text-primary me-2"></i> Editar Registro</h3>
+            <form asp-action="Editar" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Vehículo</label>
+                    <select asp-for="VehiculoId" class="form-select" asp-items="ViewBag.IdVehiculo"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Fecha</label>
+                    <input asp-for="Fecha" type="date" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="TipoMantenimientoId" class="form-label fw-bold">Tipo de Mantenimiento</label>
+                    <select asp-for="TipoMantenimientoId" asp-items="ViewBag.Tipos" class="form-select">
+                        <option value="">-- Seleccione un tipo --</option>
+                    </select>
+                    <span asp-validation-for="TipoMantenimientoId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Descripcion" class="form-label fw-bold">Descripción del Trabajo / Repuesto</label>
+                    <textarea asp-for="Descripcion" class="form-control" rows="3" style="resize: vertical;"></textarea>
+                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Costo ($)</label>
+                    <input asp-for="Valor" type="number" step="0.01" class="form-control" />
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Kilometraje</label>
+                        <input asp-for="Kilometraje" class="form-control" type="number" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Próximo Cambio (Km)</label>
+                        <input asp-for="ProximoCambio" class="form-control" type="number" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label>Nombre del Taller</label>
+                    <input asp-for="Taller" class="form-control" />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Garantía</label>
+                        <input asp-for="Garantia" class="form-control" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>IVA ($)</label>
+                        <input asp-for="Iva" class="form-control" type="number" step="0.01" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Actualizar</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

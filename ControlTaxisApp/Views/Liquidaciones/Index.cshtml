@@ -1,0 +1,184 @@
+﻿@model IEnumerable<ControlTaxisApp.Models.LiquidacionDiaria>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Globalization
+@using ControlTaxisApp.Controllers
+@{
+    Layout = null;
+    // Creamos una lista de nombres de meses en español
+    var meses = Enumerable.Range(1, 12)
+        .Select(i => new { Valor = i, Nombre = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i) })
+        .ToList();
+}
+@{
+    var festivos = ViewBag.Festivos as List<DateTime> ?? new List<DateTime>();
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container my-5">
+        <div class="card shadow-sm p-4 mb-4 border-start border-warning border-5">
+            <h2 class="fw-bold text-secondary"><i class="fa-solid fa-calculator text-warning me-2"></i> Liquidaciones Mensuales</h2>
+            <div class="d-flex justify-content-between mt-3">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Inicio</a>
+                <a asp-controller="Liquidaciones" asp-action="Crear" class="btn btn-success btn-sm"><i class="fa-solid fa-plus me-1"></i> Nueva</a>
+            </div>
+        </div>
+        <form asp-action="Index" method="get" id="filtroForm">
+            <div class="row align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Placa</label>
+                    <select name="placaFiltro" class="form-select">
+                        <option value="">-- Todas las placas --</option>
+                        @foreach (var p in (List<string>)ViewBag.PlacasDisponibles)
+                        {
+                            // Mantiene el valor seleccionado después de filtrar
+                            <option value="@p" selected="@(p == Context.Request.Query["placaFiltro"] ? "selected" : null)">@p</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Mes</label>
+                    <select name="mes" class="form-select">
+                        <option value="">-- Seleccionar Mes --</option>
+                        @foreach (var m in meses)
+                        {
+                            var nombreMes = char.ToUpper(m.Nombre[0]) + m.Nombre.Substring(1);
+                            // Mantiene el valor seleccionado después de filtrar
+                            <option value="@m.Valor" selected="@(m.Valor.ToString() == Context.Request.Query["mes"] ? "selected" : null)">@nombreMes</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Año</label>
+                    <input type="number"
+                           name="anio"
+                           value="@(Context.Request.Query["anio"].FirstOrDefault() ?? ViewData["AnioActual"]?.ToString())"
+                           placeholder="Ej: 2026"
+                           class="form-control" />
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" asp-action="Index" class="btn btn-primary w-50">
+                        <i class="fa-solid fa-filter"></i> Filtrar
+                    </button>
+
+                    <button type="submit" asp-action="GenerarReporteExcel" class="btn btn-success w-50">
+                        <i class="fa-solid fa-file-excel"></i> Generar Reporte
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="card shadow-sm p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Placa</th>
+                            <th>Producido</th>
+                            <th>Gastos</th>
+                            <th>Ahorro</th>                          
+                            <th>Saldo</th>
+                            <th>Dia laboral</th>
+                            <th>Pico y Placa</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            // Lógica de Pico y Placa y color de Domingo
+                            bool tieneRestriccion = item.Vehiculo != null && ControlTaxisApp.Services.PicoYPlacaService.TienePicoYPlaca(item.Vehiculo.Placa, DateTime.Now);
+                            string filaClase = item.Fecha.DayOfWeek == DayOfWeek.Sunday ? "table-danger" : "";
+
+                            <tr class="">
+                                <td>
+                                    <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
+                                    <span class="text-muted">@item.Fecha.ToString("dddd").ToUpper()</span>
+                                </td>
+                                <td>
+                                    @if (item.Vehiculo != null)
+                                    {
+                                        @* Aquí quitamos el span con la clase badge y el if ternario *@
+                                        <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">@item.Vehiculo.Placa</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">ID: @item.VehiculoId</span>
+                                    }
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.Producido)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Gastos)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Ahorro)</td>
+                               
+                                <td class="fw-bold text-primary">$@item.Saldo.ToString("N0")</td>
+                                <td>
+                                    @{
+                                        bool esDomingo = item.Fecha.DayOfWeek == DayOfWeek.Sunday;
+                                        bool esFestivo = festivos.Contains(item.Fecha.Date);
+                                    }
+                                    @if (esDomingo)
+                                    {
+                                        <span class="badge bg-info text-dark">DOMINGO</span>
+                                    }
+                                    else if (esFestivo)
+                                    {
+
+                                        <span class="badge bg-secondary">FESTIVO</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-success">HÁBIL</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @{
+                                        bool tienePicoPlaca = LiquidacionesController.EsPicoYPlaca(item.Vehiculo?.Placa, item.Fecha);
+                                        bool esNoLaboral = esDomingo || esFestivo;
+                                    }
+
+                                    @if (tienePicoPlaca)
+                                    {
+
+                                        <span class="badge bg-danger">SÍ</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-success">NO</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <a asp-action="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></a>
+                                        <form asp-action="Eliminar" asp-route-id="@item.Id" method="post">
+                                            <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-secondary fw-bold">
+                        <tr>
+                            <td colspan="2" class="text-end">TOTALES</td>
+                            <td>$@Model.Sum(x => x.Producido).ToString("N0")</td>
+                            <td>$@Model.Sum(x => x.Gastos ?? 0).ToString("N0")</td>
+                            <td>$@Model.Sum(x => x.Ahorro ?? 0).ToString("N0")</td>
+                            <td>$@Model.Sum(x => x.Saldo).ToString("N0")</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
