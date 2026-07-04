@@ -40,7 +40,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ControlTaxisContext>();
-    db.Database.EnsureCreated();
+    // Quitamos EnsureCreated() porque ya subimos nuestra base de datos manualmente.
+    // Esto evita que EF intente "arreglar" o "vaciar" nuestra DB.
+    // db.Database.EnsureCreated(); 
 }
 
 // --- 5. PIPELINE HTTP ---
