@@ -49,5 +49,20 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Si detecta un error 404 (página no encontrada), espera 5 segundos y recarga.
+        // Esto ayuda cuando la máquina de Fly.io está despertando.
+        window.addEventListener('load', function() {
+            if (document.title.includes("404")) {
+                console.log("Detectado error 404, recargando en 5 segundos...");
+                setTimeout(function() {
+                    location.reload();
+                }, 5000);
+            }
+        });
+    </script>
+
+
 </body>
 </html>
