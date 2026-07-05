@@ -30,7 +30,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options =>
     {
-        options.LoginPath = "/Acceso/Index";
+        options.LoginPath = "/Acceso/Login";
     });
 
 var app = builder.Build();
