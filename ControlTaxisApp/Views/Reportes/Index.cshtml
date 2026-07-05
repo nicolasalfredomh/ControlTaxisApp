@@ -85,7 +85,7 @@
         <div class="col-md-4">
             <div class="card bg-primary text-white p-3 shadow-sm">
                 <h5>Utilidad Neta</h5>
-                <h3>@Model.UtilidadNeta.ToString("C0")</h3>
+                <h3>@Model.UtilidadNeta.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</h3>
             </div>
         </div>
     </div>
@@ -125,8 +125,8 @@
                                     <span class="text-muted">ID: @item.VehiculoId</span>
                                 }
                             </td>
-                            <td>@item.Producido.ToString("C0")</td>
-                            <td>@(item.Gastos?.ToString("C0") ?? "$0")</td>
+                                <td>@item.Producido.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>
+                                <td>@(item.Gastos?.ToString("C0", new System.Globalization.CultureInfo("es-CO")) ?? "$0")</td>
                             <td>
                                 @{
                                     // 1. Normalizamos a Date (00:00:00) para eliminar cualquier resto de hora
@@ -169,7 +169,7 @@
                                     <span class="badge bg-success">NO</span>
                                 }
                             </td>
-                            <td>@item.Saldo.ToString("C0")</td>
+                                <td>@item.Saldo.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>
                         </tr>
                     }
                 </tbody>
@@ -195,7 +195,7 @@
                             <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
                             <td>@(item.IdVehiculoNavigation?.Placa ?? "N/A")</td>
                             <td>@item.Descripcion</td>
-                            <td>@item.Valor.ToString("C0")</td>
+                                <td>@item.Valor.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>
                         </tr>
                     }
                 </tbody>
