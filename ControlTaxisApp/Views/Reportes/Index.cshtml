@@ -1,5 +1,9 @@
-﻿@model ControlTaxisApp.Models.ViewModels.ReporteConsolidadoViewModel
-
+﻿@using ControlTaxisApp.Controllers
+@using System.Globalization
+@model ControlTaxisApp.Models.ViewModels.ReporteConsolidadoViewModel
+@{
+    var festivos = ViewBag.Festivos as List<DateTime> ?? new List<DateTime>();
+}
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="fa-solid fa-chart-line text-primary"></i> Reporte Consolidado</h2>
@@ -39,6 +43,26 @@
                 <label>Hasta</label>
                 <input type="date" name="fechaFin" class="form-control" />
             </div>
+            <div class="col-md-2">
+                <label>Pico y Placa</label>
+                <select name="picoYPlacaFiltro" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="true">Sí</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+
+            <!-- Filtro de Día Laboral -->
+            <div class="col-md-2">
+                <label>Tipo de Día</label>
+                <select name="tipoDiaFiltro" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="Habil">Hábil</option>
+                    <option value="Festivo">Festivo</option>
+                    <option value="Domingo">Domingo</option>
+                </select>
+            </div>
+
             <div class="col-md-2 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary w-100">Filtrar Reporte</button>
             </div>
@@ -67,14 +91,18 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-12 col-xl-8 mb-4">
             <h4>Planillas de Liquidación</h4>
+            <div class="table-responsive">          
             <table class="table table-hover border">
                 <thead class="table-light">
                     <tr>
+                        <th>Fecha</th>
                         <th>Placa</th>
                         <th>Producido</th>
                         <th>Gastos</th>
+                        <th>Día Laboral</th> 
+                        <th>Pico y Placa</th>
                         <th>Saldo</th>
                     </tr>
                 </thead>
@@ -82,20 +110,79 @@
                     @foreach (var item in Model.Liquidaciones)
                     {
                         <tr>
-                            <td>@(item.Vehiculo?.Placa ?? "N/A")</td>
+                            <td>
+                                <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
+                                <span class="text-muted">@item.Fecha.ToString("dddd").ToUpper()</span>
+                            </td>
+                            <td>
+                                @if (item.Vehiculo != null)
+                                {
+                                    @* Aquí quitamos el span con la clase badge y el if ternario *@
+                                    <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">@item.Vehiculo.Placa</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">ID: @item.VehiculoId</span>
+                                }
+                            </td>
                             <td>@item.Producido.ToString("C0")</td>
                             <td>@(item.Gastos?.ToString("C0") ?? "$0")</td>
+                            <td>
+                                @{
+                                    // 1. Normalizamos a Date (00:00:00) para eliminar cualquier resto de hora
+                                    DateTime fechaFiltro = item.Fecha.Date;
+
+                                    // 2. Usamos .Any() para comparar explícitamente solo la fecha
+                                    bool esDomingo = fechaFiltro.DayOfWeek == DayOfWeek.Sunday;
+                                    bool esFestivo = festivos.Any(f => f.Date == fechaFiltro);
+                                }
+                                @if (esDomingo)
+                                {
+                                    <span class="badge bg-info text-dark">DOMINGO</span>
+                                }
+                                else if (esFestivo)
+                                {
+
+                                    <span class="badge bg-secondary">FESTIVO</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-success">HÁBIL</span>
+                                }
+                            </td>
+
+                            <td>
+                                @{
+                                    bool tienePicoPlaca = LiquidacionesController.EsPicoYPlaca(item.Vehiculo?.Placa, item.Fecha);
+                                    bool esNoLaboral = esDomingo || esFestivo;
+                                }
+
+                                @if (tienePicoPlaca)
+                                {
+
+                                    <span class="badge bg-danger">SÍ</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-success">NO</span>
+                                }
+                            </td>
                             <td>@item.Saldo.ToString("C0")</td>
                         </tr>
                     }
                 </tbody>
             </table>
+            </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-12 col-xl-4 mb-4">
             <h4>Gastos de Mantenimiento</h4>
-            <table class="table table-hover border">
+            <div class="table-responsive">
+                <table class="table table-hover border">
                 <thead class="table-light">
                     <tr>
+                        <th>Fecha</th>
                         <th>Placa</th>
                         <th>Descripción</th>
                         <th>Costo</th>
@@ -105,6 +192,7 @@
                     @foreach (var item in Model.Mantenimientos)
                     {
                         <tr>
+                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
                             <td>@(item.IdVehiculoNavigation?.Placa ?? "N/A")</td>
                             <td>@item.Descripcion</td>
                             <td>@item.Valor.ToString("C0")</td>
