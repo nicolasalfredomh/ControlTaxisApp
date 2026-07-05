@@ -41,22 +41,13 @@ namespace ControlTaxisApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string nombreUsuario, string clave)
+        public async Task<IActionResult> Login(string nombreUsuario, string clave, string? returnUrl)
         {
-            if (string.IsNullOrEmpty(nombreUsuario) || string.IsNullOrEmpty(clave))
-            {
-                ViewBag.Error = "Por favor, complete todos los campos.";
-                return View();
-            }
-
-            // MODO ULTRA SIMPLIFICADO: SQL evalúa usuario y contraseña al mismo tiempo.
-            // No importa si la clave es '12345' o 'Admin123', lo que esté escrito tal cual en la columna 'Clave' pasará.
             var usuarioEcontrado = await _context.Usuarios
                 .FromSqlRaw("SELECT * FROM Usuarios WHERE LOWER(NombreUsuario) = LOWER({0}) AND Clave = {1}", nombreUsuario, clave)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
-            // Si la consulta trajo algo, significa que los dos datos son correctos en la BD
             if (usuarioEcontrado != null)
             {
                 var claims = new List<Claim> {
@@ -66,6 +57,10 @@ namespace ControlTaxisApp.Controllers
 
                 var claimsIdentity = new ClaimsIdentity(claims, AuthScheme);
                 await HttpContext.SignInAsync(AuthScheme, new ClaimsPrincipal(claimsIdentity));
+
+                // 2. CORRECCIÓN: Si hay una URL de retorno, úsala, si no, ve a Home/Index
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    return Redirect(returnUrl);
 
                 return RedirectToAction("Index", "Home");
             }
