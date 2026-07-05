@@ -21,7 +21,7 @@ primary_region = 'lax'
   auto_stop_machines = 'stop'
   auto_start_machines = true
   # CAMBIO: Mantenemos al menos 1 máquina encendida para que responda al instante
-  min_machines_running = 1
+  min_machines_running = 0
   processes = ['app']
 
 [vm]
