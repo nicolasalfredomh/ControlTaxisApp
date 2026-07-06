@@ -75,13 +75,13 @@
         <div class="col-md-4">
             <div class="card bg-success text-white p-3 shadow-sm">
                 <h5>Total Ingresos</h5>
-                <h3>@Model.TotalProducido.ToString("C0")</h3>
+            <h3>@Model.TotalProducido.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</h3>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card bg-danger text-white p-3 shadow-sm">
                 <h5>Total Gastos</h5>
-                <h3>@((Model.TotalGastosLiquidacion).ToString("C0"))</h3>
+            <h3>@((Model.TotalGastosLiquidacion).ToString("C0", new System.Globalization.CultureInfo("es-CO")))</h3>
             </div>
         </div>
         <div class="col-md-4">
@@ -143,7 +143,7 @@
                         <tr class="@filaClase">
                             <td>
                                 <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
-                                <span class="text-muted">@item.Fecha.ToString("dddd").ToUpper()</span>
+                                <span class="text-muted">@item.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES")).ToUpper()</span>
                             </td>
                             <td>
                                 @if (item.Vehiculo != null)
