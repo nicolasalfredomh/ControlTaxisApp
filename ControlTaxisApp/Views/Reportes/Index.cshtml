@@ -4,11 +4,20 @@
 @{
     var festivos = ViewBag.Festivos as List<DateTime> ?? new List<DateTime>();
 }
+
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="fa-solid fa-chart-line text-primary"></i> Reporte Consolidado</h2>
         <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Volver al Panel</a>
     </div>
+</div>
+
 
     <div class="card p-3 mb-4 shadow-sm">
         <form method="get" class="row g-3 p-3 bg-light rounded shadow-sm mb-4">
@@ -217,8 +226,3 @@
     </div>
 </div>
 
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
