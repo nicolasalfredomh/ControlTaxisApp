@@ -4,13 +4,6 @@
 @{
     var festivos = ViewBag.Festivos as List<DateTime> ?? new List<DateTime>();
 }
-
-
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="fa-solid fa-chart-line text-primary"></i> Reporte Consolidado</h2>
@@ -103,7 +96,7 @@
         <div class="col-12 mb-4">
             <h4>Planillas de Liquidación</h4>
             <div class="table-responsive">  
-                <table id="tablaLiquidaciones" class="table table-hover border">
+            <table id="tablaLiquidaciones" class="table table-hover border w-100">
                 <thead class="table-light">
                     <tr>
                         <th>Fecha</th>
@@ -188,7 +181,7 @@
         <div class="col-12 mb-4">
             <h4>Gastos de Mantenimiento</h4>
             <div class="table-responsive">
-                <table id="tablaMantenimientos" class="table table-hover border">
+            <table id="tablaMantenimientos" class="table table-hover border w-100">
                 <thead class="table-light">
                     <tr>
                         <th>Fecha</th>
@@ -210,6 +203,7 @@
                 </tbody>
             </table>
 
+            @section Scripts {
                 <script>
                     $(document).ready(function () {
                         $('#tablaLiquidaciones').DataTable({
@@ -222,6 +216,7 @@
                         });
                     });
                 </script>
+            }
         </div>
     </div>
 </div>
