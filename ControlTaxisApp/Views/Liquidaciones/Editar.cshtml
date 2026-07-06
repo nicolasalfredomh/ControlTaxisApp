@@ -32,6 +32,13 @@
                             <option value="">-- Seleccione una Placa --</option>
                         </select>
                     </div>
+                    <div class="form-group mb-3">
+                        <label class="control-label">¿Tiene Pico y Placa?</label>
+                        <select asp-for="PicoYPlaca" class="form-select">
+                            <option value="false">No</option>
+                            <option value="true">Sí</option>
+                        </select>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold text-muted">Monto de Producción ($)</label>
                         <input asp-for="Producido" id="producido" type="number" step="0.01" class="form-control" oninput="calcularSaldo()" />

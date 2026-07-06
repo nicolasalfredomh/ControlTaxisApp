@@ -145,7 +145,7 @@ namespace ControlTaxisApp.Controllers
             liquidacionOriginal.Producido = liquidacionModificada.Producido;
             liquidacionOriginal.Gastos = liquidacionModificada.Gastos;
             liquidacionOriginal.Ahorro = liquidacionModificada.Ahorro;
-
+            liquidacionOriginal.PicoYPlaca = liquidacionModificada.PicoYPlaca;
             // 3. Calcular el saldo manualmente
             decimal gastos = liquidacionModificada.Gastos ?? 0; // Si es null, lo tratamos como 0
             decimal producido = liquidacionModificada.Producido; // Si es null, lo tratamos como 0
@@ -155,6 +155,7 @@ namespace ControlTaxisApp.Controllers
 
             if (ModelState.IsValid)
             {
+               
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

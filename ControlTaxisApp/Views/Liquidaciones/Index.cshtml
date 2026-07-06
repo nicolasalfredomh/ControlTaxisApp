@@ -96,7 +96,7 @@
                             bool tieneRestriccion = item.Vehiculo != null && ControlTaxisApp.Services.PicoYPlacaService.TienePicoYPlaca(item.Vehiculo.Placa, DateTime.Now);
                             string filaClase = item.Fecha.DayOfWeek == DayOfWeek.Sunday ? "table-danger" : "";
 
-                            <tr class="">
+                            <tr class="@(item.PicoYPlaca ? "table-warning" : "")">
                                 <td>
                                     <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
                                     <span class="text-muted">@item.Fecha.ToString("dddd").ToUpper()</span>

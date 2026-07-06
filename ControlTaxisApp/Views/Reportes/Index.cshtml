@@ -91,7 +91,19 @@
             </div>
         </div>
     </div>
-
+<div class="mb-3 p-3 border rounded bg-light">
+    <strong>Leyenda de colores:</strong>
+    <ul class="list-inline mb-0 mt-2">
+        <li class="list-inline-item">
+            <span class="badge" style="background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7;">&nbsp;&nbsp;</span>
+            Tiene mantenimiento
+        </li>
+        <li class="list-inline-item ms-3">
+            <span class="badge" style="background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5;">&nbsp;&nbsp;</span>
+            Tiene pico y placa
+        </li>
+    </ul>
+</div>
     <div class="row">
         <div class="col-12 mb-4">
             <h4>Planillas de Liquidación</h4>
@@ -111,7 +123,24 @@
                 <tbody>
                     @foreach (var item in Model.Liquidaciones)
                     {
-                        <tr>
+
+                        // 1. Verificamos si existe un mantenimiento para este día y este vehículo
+                        bool tieneMantenimiento = Model.Mantenimientos.Any(m =>
+                        m.Fecha.Date == item.Fecha.Date &&
+                        m.VehiculoId == item.VehiculoId);
+
+                        // 2. Definimos la clase CSS (Prioridad: Rojo si hay mantenimiento, Amarillo si hay pico y placa)
+                        string filaClase = "";
+                        if (tieneMantenimiento)
+                        {
+                            filaClase = "table-danger";
+                        }
+                        else if (item.PicoYPlaca)
+                        {
+                            filaClase = "table-warning";
+                        }
+
+                        <tr class="@filaClase">
                             <td>
                                 <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
                                 <span class="text-muted">@item.Fecha.ToString("dddd").ToUpper()</span>

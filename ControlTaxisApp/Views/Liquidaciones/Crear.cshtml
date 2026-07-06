@@ -37,6 +37,14 @@
                             <label class="form-label">Fecha de Labor</label>
                             <input asp-for="Fecha" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                         </div>
+
+                        <div class="form-group">
+                            <label>¿Tiene Pico y Placa?</label>
+                            <select asp-for="PicoYPlaca" class="form-select">
+                                <option value="false">No</option>
+                                <option value="true">Sí</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="row">
