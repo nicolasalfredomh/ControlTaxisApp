@@ -72,35 +72,55 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ControlTaxisContext>();
 
-    // Verificamos si la tabla de Festivos está vacía
-    if (!context.Festivos.Any())
-    {
-        var listaFestivos = new List<Festivo>
-{
-    new Festivo { Fecha = new DateTime(2026, 1, 1), Nombre = "Año Nuevo" },
-    new Festivo { Fecha = new DateTime(2026, 1, 12), Nombre = "Día de los Reyes Magos" },
-    new Festivo { Fecha = new DateTime(2026, 3, 23), Nombre = "Día de San José" },
-    new Festivo { Fecha = new DateTime(2026, 4, 2), Nombre = "Jueves Santo" },
-    new Festivo { Fecha = new DateTime(2026, 4, 3), Nombre = "Viernes Santo" },
-    new Festivo { Fecha = new DateTime(2026, 5, 1), Nombre = "Día del Trabajo" },
-    new Festivo { Fecha = new DateTime(2026, 5, 18), Nombre = "Día de la Ascensión" },
-    new Festivo { Fecha = new DateTime(2026, 6, 8), Nombre = "Corpus Christi" },
-    new Festivo { Fecha = new DateTime(2026, 6, 15), Nombre = "Sagrado Corazón" },
-    new Festivo { Fecha = new DateTime(2026, 7, 3), Nombre = "San Pedro y San Pablo" }, // Observado
-    new Festivo { Fecha = new DateTime(2026, 7, 20), Nombre = "Independencia de Colombia" },
-    new Festivo { Fecha = new DateTime(2026, 8, 7), Nombre = "Batalla de Boyacá" },
-    new Festivo { Fecha = new DateTime(2026, 8, 17), Nombre = "La Asunción de la Virgen" },
-    new Festivo { Fecha = new DateTime(2026, 10, 12), Nombre = "Día de la Raza" },
-    new Festivo { Fecha = new DateTime(2026, 11, 2), Nombre = "Todos los Santos" },
-    new Festivo { Fecha = new DateTime(2026, 11, 16), Nombre = "Independencia de Cartagena" },
-    new Festivo { Fecha = new DateTime(2026, 12, 7), Nombre = "Día de las Velitas" },
-    new Festivo { Fecha = new DateTime(2026, 12, 8), Nombre = "Inmaculada Concepción" },
-    new Festivo { Fecha = new DateTime(2026, 12, 25), Nombre = "Navidad" }
-};
+    // 1. Limpiamos la tabla para asegurar que siempre esté actualizada
+    context.Database.ExecuteSqlRaw("DELETE FROM Festivos");
 
-        context.Festivos.AddRange(listaFestivos);
-        context.SaveChanges();
-    }
+    // 2. Definimos la lista completa
+    var todosLosFestivos = new List<Festivo>
+    {
+        // Festivos 2025
+        new Festivo { Fecha = new DateTime(2025, 1, 1), Nombre = "Año Nuevo" },
+        new Festivo { Fecha = new DateTime(2025, 1, 6), Nombre = "Día de los Reyes Magos" },
+        new Festivo { Fecha = new DateTime(2025, 3, 24), Nombre = "Día de San José" },
+        new Festivo { Fecha = new DateTime(2025, 4, 17), Nombre = "Jueves Santo" },
+        new Festivo { Fecha = new DateTime(2025, 4, 18), Nombre = "Viernes Santo" },
+        new Festivo { Fecha = new DateTime(2025, 5, 1), Nombre = "Día del Trabajo" },
+        new Festivo { Fecha = new DateTime(2025, 6, 2), Nombre = "Día de la Ascensión" },
+        new Festivo { Fecha = new DateTime(2025, 6, 23), Nombre = "Corpus Christi" },
+        new Festivo { Fecha = new DateTime(2025, 6, 30), Nombre = "Sagrado Corazón" },
+        new Festivo { Fecha = new DateTime(2025, 7, 20), Nombre = "Día de la Independencia" },
+        new Festivo { Fecha = new DateTime(2025, 8, 7), Nombre = "Batalla de Boyacá" },
+        new Festivo { Fecha = new DateTime(2025, 8, 18), Nombre = "Asunción de la Virgen" },
+        new Festivo { Fecha = new DateTime(2025, 10, 13), Nombre = "Día de la Raza" },
+        new Festivo { Fecha = new DateTime(2025, 11, 3), Nombre = "Todos los Santos" },
+        new Festivo { Fecha = new DateTime(2025, 11, 17), Nombre = "Independencia de Cartagena" },
+        new Festivo { Fecha = new DateTime(2025, 12, 8), Nombre = "Inmaculada Concepción" },
+        new Festivo { Fecha = new DateTime(2025, 12, 25), Nombre = "Navidad" },
+
+        // Festivos 2026
+        new Festivo { Fecha = new DateTime(2026, 1, 1), Nombre = "Año Nuevo" },
+        new Festivo { Fecha = new DateTime(2026, 1, 12), Nombre = "Día de los Reyes Magos" },
+        new Festivo { Fecha = new DateTime(2026, 3, 23), Nombre = "Día de San José" },
+        new Festivo { Fecha = new DateTime(2026, 4, 2), Nombre = "Jueves Santo" },
+        new Festivo { Fecha = new DateTime(2026, 4, 3), Nombre = "Viernes Santo" },
+        new Festivo { Fecha = new DateTime(2026, 5, 1), Nombre = "Día del Trabajo" },
+        new Festivo { Fecha = new DateTime(2026, 5, 18), Nombre = "Día de la Ascensión" },
+        new Festivo { Fecha = new DateTime(2026, 6, 8), Nombre = "Corpus Christi" },
+        new Festivo { Fecha = new DateTime(2026, 6, 15), Nombre = "Sagrado Corazón" },
+        new Festivo { Fecha = new DateTime(2026, 7, 3), Nombre = "San Pedro y San Pablo" },
+        new Festivo { Fecha = new DateTime(2026, 7, 20), Nombre = "Día de la Independencia" },
+        new Festivo { Fecha = new DateTime(2026, 8, 7), Nombre = "Batalla de Boyacá" },
+        new Festivo { Fecha = new DateTime(2026, 8, 17), Nombre = "Asunción de la Virgen" },
+        new Festivo { Fecha = new DateTime(2026, 10, 12), Nombre = "Día de la Raza" },
+        new Festivo { Fecha = new DateTime(2026, 11, 2), Nombre = "Todos los Santos" },
+        new Festivo { Fecha = new DateTime(2026, 11, 16), Nombre = "Independencia de Cartagena" },
+        new Festivo { Fecha = new DateTime(2026, 12, 7), Nombre = "Día de las Velitas" },
+        new Festivo { Fecha = new DateTime(2026, 12, 8), Nombre = "Inmaculada Concepción" },
+        new Festivo { Fecha = new DateTime(2026, 12, 25), Nombre = "Navidad" }
+    };
+
+    context.Festivos.AddRange(todosLosFestivos);
+    context.SaveChanges();
 }
 
 app.Run();
