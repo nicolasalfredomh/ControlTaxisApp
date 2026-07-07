@@ -6,8 +6,13 @@
     Layout = null;
     // Creamos una lista de nombres de meses en español
     var meses = Enumerable.Range(1, 12)
-        .Select(i => new { Valor = i, Nombre = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i) })
-        .ToList();
+      .Select(i => new
+      {
+          Valor = i,
+          // Fuerza el idioma a español (es-ES)
+          Nombre = new CultureInfo("es-ES").DateTimeFormat.GetMonthName(i)
+      })
+      .ToList();
 }
 @{
     var festivos = ViewBag.Festivos as List<DateTime> ?? new List<DateTime>();
@@ -18,6 +23,7 @@
     <meta charset="utf-8" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" />
 </head>
 <body class="bg-light">
     <div class="container my-5">
@@ -47,9 +53,10 @@
                         <option value="">-- Seleccionar Mes --</option>
                         @foreach (var m in meses)
                         {
-                            var nombreMes = char.ToUpper(m.Nombre[0]) + m.Nombre.Substring(1);
-                            // Mantiene el valor seleccionado después de filtrar
-                            <option value="@m.Valor" selected="@(m.Valor.ToString() == Context.Request.Query["mes"] ? "selected" : null)">@nombreMes</option>
+                            // Usamos una comparación más limpia para el 'selected'
+                            var esSeleccionado = (m.Valor.ToString() == Context.Request.Query["mes"]) ? "selected" : null;
+
+                            <option value="@m.Valor" selected="@esSeleccionado">@m.Nombre</option>
                         }
                     </select>
                 </div>
@@ -75,7 +82,7 @@
 
         <div class="card shadow-sm p-4">
             <div class="table-responsive">
-                <table class="table table-hover align-middle table-bordered">
+                <table id="tablaLiquidaciones" class="table table-hover align-middle table-bordered">
                     <thead class="table-dark">
                         <tr>
                             <th>Fecha</th>
@@ -190,5 +197,21 @@
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+            $(document).ready(function () {
+                $('#tablaLiquidaciones').DataTable({
+                    "pageLength": 10, // Cantidad de registros por página
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
+                    },
+                    "order": [[0, "desc"]] // Ordenar por la primera columna (Fecha) de forma descendente
+                });
+            });
+    </script>
+
+
 </body>
 </html>

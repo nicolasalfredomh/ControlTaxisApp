@@ -15,7 +15,26 @@ namespace ControlTaxisApp.Controllers
         public LiquidacionesController(ControlTaxisContext context)
         {
             _context = context;
-           
+
+            // En tu Acción (Controller)
+            var meses = new[]
+            {
+    new { Valor = 1, Nombre = "Enero" },
+    new { Valor = 2, Nombre = "Febrero" },
+    new { Valor = 3, Nombre = "Marzo" },
+    new { Valor = 4, Nombre = "Abril" },
+    new { Valor = 5, Nombre = "Mayo" },
+    new { Valor = 6, Nombre = "Junio" },
+    new { Valor = 7, Nombre = "Julio" },
+    new { Valor = 8, Nombre = "Agosto" },
+    new { Valor = 9, Nombre = "Septiembre" },
+    new { Valor = 10, Nombre = "Octubre" },
+    new { Valor = 11, Nombre = "Noviembre" },
+    new { Valor = 12, Nombre = "Diciembre" }
+};
+
+            ViewBag.Meses = meses;
+
         }
 
         // Método para verificar si el día no es laboral
