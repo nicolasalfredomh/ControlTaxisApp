@@ -127,17 +127,33 @@
                         m.Fecha.Date == item.Fecha.Date &&
                         m.VehiculoId == item.VehiculoId);
 
-                      
-                        // 1. Lógica para definir el color de la fila
-                        string filaClase = item.EstadoDia switch
-                        {
-                            "TALLER" => "table-danger",
-                            "DESCANSO" => "table-primary",
-                            "PICO_Y_PLACA" => "table-warning",
-                            _ => "" // Normal (sin color)
-                        };
+                        bool esDomingo = item.Fecha.DayOfWeek == DayOfWeek.Sunday;
+                        bool esFestivo = ViewBag.Festivos != null && ((List<DateTime>)ViewBag.Festivos).Contains(item.Fecha.Date);
 
-                        <tr class="@filaClase">
+                        // Definimos el estilo de la fila
+                        string filaClase = "";
+                        string estiloFila = ""; // Para colores personalizados
+
+                        if (esDomingo || esFestivo)
+                        {
+                            filaClase = "table-danger";
+                        }
+                        else
+                        {
+                            switch (item.EstadoDia)
+                            {
+                                case "TALLER":
+                                    estiloFila = "background-color: #fd7e14; color: white;"; // Naranja vibrante
+                                    break;
+                                case "DESCANSO":
+                                    filaClase = "table-primary";
+                                    break;
+                                case "PICO_Y_PLACA":
+                                    filaClase = "table-warning";
+                                    break;
+                            }
+                        }
+                        <tr class="@filaClase" style="@estiloFila">
                             <td>
                                 <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
                                 <span class="text-muted">@item.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES")).ToUpper()</span>
@@ -161,14 +177,14 @@
                                     DateTime fechaFiltro = item.Fecha.Date;
 
                                     // 2. Usamos .Any() para comparar explícitamente solo la fecha
-                                    bool esDomingo = fechaFiltro.DayOfWeek == DayOfWeek.Sunday;
-                                    bool esFestivo = festivos.Any(f => f.Date == fechaFiltro);
+                                    bool esDomingos = fechaFiltro.DayOfWeek == DayOfWeek.Sunday;
+                                    bool esFestivos = festivos.Any(f => f.Date == fechaFiltro);
                                 }
-                                @if (esDomingo)
+                                @if (esDomingos)
                                 {
                                     <span class="badge bg-info text-dark">DOMINGO</span>
                                 }
-                                else if (esFestivo)
+                                else if (esFestivos)
                                 {
 
                                     <span class="badge bg-danger">FESTIVO</span>

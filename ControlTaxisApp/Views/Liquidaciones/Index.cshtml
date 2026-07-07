@@ -99,21 +99,39 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            // Lógica de colores basada en el nuevo estado manual
-                            string filaClase = item.EstadoDia switch
+                            bool esDomingo = item.Fecha.DayOfWeek == DayOfWeek.Sunday;
+                            bool esFestivo = ViewBag.Festivos != null && ((List<DateTime>)ViewBag.Festivos).Contains(item.Fecha.Date);
+
+                            // Definimos el estilo de la fila
+                            string filaClase = "";
+                            string estiloFila = ""; // Para colores personalizados
+
+                            if (esDomingo || esFestivo)
                             {
-                                "TALLER" => "table-danger",       // Rojo
-                                "DESCANSO" => "table-primary",    // Azul
-                                "PICO_Y_PLACA" => "table-warning",// Amarillo
-                                _ => ""                           // Normal
-                            };
+                                filaClase = "table-danger";
+                            }
+                            else
+                            {
+                                switch (item.EstadoDia)
+                                {
+                                    case "TALLER":
+                                        estiloFila = "background-color: #fd7e14; color: white;"; // Naranja vibrante
+                                        break;
+                                    case "DESCANSO":
+                                        filaClase = "table-primary";
+                                        break;
+                                    case "PICO_Y_PLACA":
+                                        filaClase = "table-warning";
+                                        break;
+                                }
+                            }
                             // Lógica de Pico y Placa y color de Domingo
                             bool tieneRestriccion = item.Vehiculo != null && ControlTaxisApp.Services.PicoYPlacaService.TienePicoYPlaca(item.Vehiculo.Placa, DateTime.Now);
                            
-                            <tr class="@filaClase">
+                            <tr class="@filaClase" style="@estiloFila">
                                 <td>
                                     <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
-                                    <span class="text-muted">@item.Fecha.ToString("dddd").ToUpper()</span>
+                                    <span class="text-muted">@item.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES")).ToUpper()</span>
                                 </td>
                                 <td>
                                     @if (item.Vehiculo != null)
@@ -130,17 +148,17 @@
                                 <td>@Html.DisplayFor(modelItem => item.Gastos)</td>
                                 <td>@Html.DisplayFor(modelItem => item.Ahorro)</td>
                                
-                                <td class="fw-bold text-primary">$@item.Saldo.ToString("N0")</td>
+                                <td class="fw-bold text-primary">$@item.Saldo.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>
                                 <td>
                                     @{
-                                        bool esDomingo = item.Fecha.DayOfWeek == DayOfWeek.Sunday;
-                                        bool esFestivo = festivos.Contains(item.Fecha.Date);
+                                        bool esDomingos = item.Fecha.DayOfWeek == DayOfWeek.Sunday;
+                                        bool esFestivos = festivos.Contains(item.Fecha.Date);
                                     }
-                                    @if (esDomingo)
+                                    @if (esDomingos)
                                     {
                                         <span class="badge bg-info text-dark">DOMINGO</span>
                                     }
-                                    else if (esFestivo)
+                                    else if (esFestivos)
                                     {
 
                                         <span class="badge bg-danger">FESTIVO</span>
