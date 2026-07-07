@@ -46,12 +46,14 @@
                 <input type="date" name="fechaFin" class="form-control" />
             </div>
             <div class="col-md-2">
-                <label>Pico y Placa</label>
-                <select name="picoYPlacaFiltro" class="form-select">
-                    <option value="">Todos</option>
-                    <option value="true">Sí</option>
-                    <option value="false">No</option>
-                </select>
+                <label>Estado Dia</label>
+            <select name="estadoFiltro" class="form-select">
+                <option value="">Todos</option>
+                <option value="NORMAL">Normal</option>
+                <option value="PICO_Y_PLACA">Pico y Placa</option>
+                <option value="TALLER">Taller</option>
+                <option value="DESCANSO">Descanso</option>
+            </select>
             </div>
 
             <!-- Filtro de Día Laboral -->
@@ -92,17 +94,13 @@
         </div>
     </div>
 <div class="mb-3 p-3 border rounded bg-light">
-    <strong>Leyenda de colores:</strong>
-    <ul class="list-inline mb-0 mt-2">
-        <li class="list-inline-item">
-            <span class="badge" style="background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7;">&nbsp;&nbsp;</span>
-            Tiene mantenimiento
-        </li>
-        <li class="list-inline-item ms-3">
-            <span class="badge" style="background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5;">&nbsp;&nbsp;</span>
-            Tiene pico y placa
-        </li>
-    </ul>
+<strong>Leyenda:</strong>
+<ul class="list-inline mb-0 mt-2">
+    <li class="list-inline-item"><span class="badge bg-danger">&nbsp;</span> Taller</li>
+    <li class="list-inline-item"><span class="badge bg-primary">&nbsp;</span> Descanso</li>
+    <li class="list-inline-item"><span class="badge bg-warning text-dark">&nbsp;</span> Pico y Placa</li>
+    <li class="list-inline-item"><span class="badge bg-success">&nbsp;</span> Normal</li>
+</ul>
 </div>
     <div class="row">
         <div class="col-12 mb-4">
@@ -116,7 +114,7 @@
                         <th>Producido</th>
                         <th>Gastos</th>
                         <th>Día Laboral</th> 
-                        <th>Pico y Placa</th>
+                        <th>Estado Dia</th>
                         <th>Saldo</th>
                     </tr>
                 </thead>
@@ -129,16 +127,15 @@
                         m.Fecha.Date == item.Fecha.Date &&
                         m.VehiculoId == item.VehiculoId);
 
-                        // 2. Definimos la clase CSS (Prioridad: Rojo si hay mantenimiento, Amarillo si hay pico y placa)
-                        string filaClase = "";
-                        if (tieneMantenimiento)
+                      
+                        // 1. Lógica para definir el color de la fila
+                        string filaClase = item.EstadoDia switch
                         {
-                            filaClase = "table-danger";
-                        }
-                        else if (item.PicoYPlaca)
-                        {
-                            filaClase = "table-warning";
-                        }
+                            "TALLER" => "table-danger",
+                            "DESCANSO" => "table-primary",
+                            "PICO_Y_PLACA" => "table-warning",
+                            _ => "" // Normal (sin color)
+                        };
 
                         <tr class="@filaClase">
                             <td>
@@ -174,7 +171,7 @@
                                 else if (esFestivo)
                                 {
 
-                                    <span class="badge bg-secondary">FESTIVO</span>
+                                    <span class="badge bg-danger">FESTIVO</span>
                                 }
                                 else
                                 {
@@ -184,20 +181,23 @@
                             </td>
 
                             <td>
-                                @{
-                                    bool tienePicoPlaca = LiquidacionesController.EsPicoYPlaca(item.Vehiculo?.Placa, item.Fecha);
-                                    bool esNoLaboral = esDomingo || esFestivo;
-                                }
-
-                                @if (tienePicoPlaca)
+                                @switch (item.EstadoDia)
                                 {
+                                    case "TALLER":
+                                        <span class="badge bg-danger">TALLER</span>
+                                        break;
+                                    case "DESCANSO":
 
-                                    <span class="badge bg-danger">SÍ</span>
-                                }
-                                else
-                                {
+                                        <span class="badge bg-primary">DESCANSO</span>
+                                        break;
+                                    case "PICO_Y_PLACA":
 
-                                    <span class="badge bg-success">NO</span>
+                                        <span class="badge bg-warning text-dark">PICO Y PLACA</span>
+                                        break;
+                                    default:
+
+                                        <span class="badge bg-success">NORMAL</span>
+                                        break;
                                 }
                             </td>
                                 <td>@item.Saldo.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>

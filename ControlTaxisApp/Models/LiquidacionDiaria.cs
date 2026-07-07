@@ -33,7 +33,8 @@ namespace ControlTaxisApp.Models
         [DisplayFormat(DataFormatString = "{0:C0}", ApplyFormatInEditMode = false)]
         public decimal Saldo { get; set; }
         public bool PicoYPlaca { get; set; }
-    
+
+        public string EstadoDia { get; set; }
 
         // Propiedades de navegación para hacer cruces de datos
         [ForeignKey("VehiculoId")]

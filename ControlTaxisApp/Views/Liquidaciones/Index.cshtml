@@ -85,18 +85,25 @@
                             <th>Ahorro</th>                          
                             <th>Saldo</th>
                             <th>Dia laboral</th>
-                            <th>Pico y Placa</th>
+                            <th>Estado Dia</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
                         {
+                            // Lógica de colores basada en el nuevo estado manual
+                            string filaClase = item.EstadoDia switch
+                            {
+                                "TALLER" => "table-danger",       // Rojo
+                                "DESCANSO" => "table-primary",    // Azul
+                                "PICO_Y_PLACA" => "table-warning",// Amarillo
+                                _ => ""                           // Normal
+                            };
                             // Lógica de Pico y Placa y color de Domingo
                             bool tieneRestriccion = item.Vehiculo != null && ControlTaxisApp.Services.PicoYPlacaService.TienePicoYPlaca(item.Vehiculo.Placa, DateTime.Now);
-                            string filaClase = item.Fecha.DayOfWeek == DayOfWeek.Sunday ? "table-danger" : "";
-
-                            <tr class="@(item.PicoYPlaca ? "table-warning" : "")">
+                           
+                            <tr class="@filaClase">
                                 <td>
                                     <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
                                     <span class="text-muted">@item.Fecha.ToString("dddd").ToUpper()</span>
@@ -129,7 +136,7 @@
                                     else if (esFestivo)
                                     {
 
-                                        <span class="badge bg-secondary">FESTIVO</span>
+                                        <span class="badge bg-danger">FESTIVO</span>
                                     }
                                     else
                                     {
@@ -139,20 +146,23 @@
                                 </td>
 
                                 <td>
-                                    @{
-                                        bool tienePicoPlaca = LiquidacionesController.EsPicoYPlaca(item.Vehiculo?.Placa, item.Fecha);
-                                        bool esNoLaboral = esDomingo || esFestivo;
-                                    }
-
-                                    @if (tienePicoPlaca)
+                                    @switch (item.EstadoDia)
                                     {
+                                        case "TALLER":
+                                            <span class="badge bg-danger">TALLER</span>
+                                            break;
+                                        case "DESCANSO":
 
-                                        <span class="badge bg-danger">SÍ</span>
-                                    }
-                                    else
-                                    {
+                                            <span class="badge bg-primary">DESCANSO</span>
+                                            break;
+                                        case "PICO_Y_PLACA":
 
-                                        <span class="badge bg-success">NO</span>
+                                            <span class="badge bg-warning text-dark">PICO Y PLACA</span>
+                                            break;
+                                        default:
+
+                                            <span class="badge bg-success">NORMAL</span>
+                                            break;
                                     }
                                 </td>
                                 <td class="text-center">

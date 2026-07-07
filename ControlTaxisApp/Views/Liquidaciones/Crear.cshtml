@@ -38,11 +38,13 @@
                             <input asp-for="Fecha" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                         </div>
 
-                        <div class="form-group">
-                            <label>¿Tiene Pico y Placa?</label>
-                            <select asp-for="PicoYPlaca" class="form-select">
-                                <option value="false">No</option>
-                                <option value="true">Sí</option>
+                        <div class="form-group mb-3">
+                            <label class="control-label">Estado del Día</label>
+                            <select asp-for="EstadoDia" class="form-select">
+                                <option value="NORMAL">Normal</option>
+                                <option value="PICO_Y_PLACA">Pico y Placa</option>
+                                <option value="TALLER">Día de Taller</option>
+                                <option value="DESCANSO">Día de Descanso</option>
                             </select>
                         </div>
                     </div>
