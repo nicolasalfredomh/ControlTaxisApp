@@ -39,7 +39,10 @@ var app = builder.Build();
 // Esto asegura que si el archivo .db no existe en la carpeta /app/data, se cree al iniciar
 using (var scope = app.Services.CreateScope())
 {
+  
+   
     var db = scope.ServiceProvider.GetRequiredService<ControlTaxisContext>();
+    db.Database.Migrate();
     // Quitamos EnsureCreated() porque ya subimos nuestra base de datos manualmente.
     // Esto evita que EF intente "arreglar" o "vaciar" nuestra DB.
     // db.Database.EnsureCreated(); 
