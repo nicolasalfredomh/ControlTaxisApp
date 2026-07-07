@@ -1,5 +1,6 @@
 ﻿using ControlTaxisApp.Models;
 using ControlTaxisApp.Models.ViewModels;
+using ControlTaxisApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -77,6 +78,63 @@ namespace ControlTaxisApp.Controllers
             };
 
             return View(model);
+        }
+
+        private IQueryable<LiquidacionDiaria> AplicarFiltros(string? placaFiltro, int? mes, int? anio, DateTime? fechaInicio, DateTime? fechaFin, string? estadoFiltro)
+        {
+            var query = _context.LiquidacionesDiarias.Include(l => l.Vehiculo).AsQueryable();
+
+            if (!string.IsNullOrEmpty(placaFiltro) && placaFiltro != "Todos")
+                query = query.Where(l => l.Vehiculo != null && l.Vehiculo.Placa == placaFiltro);
+
+            if (mes.HasValue) query = query.Where(l => l.Fecha.Month == mes);
+            if (anio.HasValue) query = query.Where(l => l.Fecha.Year == anio);
+
+            if (fechaInicio.HasValue && fechaFin.HasValue)
+                query = query.Where(l => l.Fecha.Date >= fechaInicio.Value.Date && l.Fecha.Date <= fechaFin.Value.Date);
+
+            if (!string.IsNullOrEmpty(estadoFiltro) && estadoFiltro != "Todos")
+                query = query.Where(l => l.EstadoDia == estadoFiltro);
+
+            return query;
+        }
+
+        public async Task<IActionResult> ExportarExcel(string? placaFiltro, int? mes, int? anio, DateTime? fechaInicio,
+                                                 DateTime? fechaFin, string? estadoFiltro, string? tipoDiaFiltro)
+        {
+            // 1. Obtenemos la consulta con los filtros básicos aplicados
+            var query = AplicarFiltros(placaFiltro, mes, anio, fechaInicio, fechaFin, estadoFiltro);
+            var listaLiquidaciones = await query.ToListAsync();
+
+            // 2. Aplicamos el filtro de Tipo de Día (en memoria, como ya lo haces)
+            var listaFestivos = await _context.Festivos.Select(f => f.Fecha.Date).ToListAsync();
+            if (!string.IsNullOrEmpty(tipoDiaFiltro) && tipoDiaFiltro != "Todos")
+            {
+                if (tipoDiaFiltro == "Festivo")
+                    listaLiquidaciones = listaLiquidaciones.Where(l => listaFestivos.Contains(l.Fecha.Date)).ToList();
+                else if (tipoDiaFiltro == "Domingo")
+                    listaLiquidaciones = listaLiquidaciones.Where(l => l.Fecha.DayOfWeek == DayOfWeek.Sunday).ToList();
+                else if (tipoDiaFiltro == "Habil")
+                    listaLiquidaciones = listaLiquidaciones.Where(l => l.Fecha.DayOfWeek != DayOfWeek.Sunday && !listaFestivos.Contains(l.Fecha.Date)).ToList();
+            }
+
+            // B. Filtramos Mantenimientos con los mismos criterios
+            var queryMant = _context.Mantenimientos.Include(m => m.IdVehiculoNavigation).AsQueryable();
+
+            if (!string.IsNullOrEmpty(placaFiltro) && placaFiltro != "Todos")
+                queryMant = queryMant.Where(m => m.IdVehiculoNavigation != null && m.IdVehiculoNavigation.Placa == placaFiltro);
+            if (mes.HasValue) queryMant = queryMant.Where(m => m.Fecha.Month == mes);
+            if (anio.HasValue) queryMant = queryMant.Where(m => m.Fecha.Year == anio);
+            if (fechaInicio.HasValue && fechaFin.HasValue)
+                queryMant = queryMant.Where(m => m.Fecha.Date >= fechaInicio.Value.Date && m.Fecha.Date <= fechaFin.Value.Date);
+
+            var listaMant = await queryMant.ToListAsync();
+
+            // 3. Generar Excel solo con la lista filtrada
+            var service = new ReporteService();
+            var fileBytes = service.GenerarExcel(listaLiquidaciones, listaMant);
+
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte_Liquidacion.xlsx");
         }
 
 

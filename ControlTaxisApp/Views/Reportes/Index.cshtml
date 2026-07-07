@@ -67,9 +67,17 @@
                 </select>
             </div>
 
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Filtrar Reporte</button>
-            </div>
+        <div class="col-md-3 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1">
+                <i class="fa-solid fa-filter"></i> Filtrar
+            </button>
+
+            <a asp-action="ExportarExcel"
+               asp-all-route-data="Context.Request.Query.ToDictionary(k => k.Key, v => (string)v.Value)"
+               class="btn btn-success flex-grow-1">
+                <i class="fa-solid fa-file-excel"></i> Excel
+            </a>
+        </div>
         </form>
     </div>
 
@@ -96,7 +104,7 @@
 <div class="mb-3 p-3 border rounded bg-light">
 <strong>Leyenda:</strong>
 <ul class="list-inline mb-0 mt-2">
-    <li class="list-inline-item"><span class="badge bg-danger">&nbsp;</span> Taller</li>
+    <li class="list-inline-item"><span class="badge bg-danger">&nbsp;</span> Festivos y Domingos</li>
     <li class="list-inline-item"><span class="badge bg-primary">&nbsp;</span> Descanso</li>
     <li class="list-inline-item"><span class="badge bg-warning text-dark">&nbsp;</span> Pico y Placa</li>
     <li class="list-inline-item"><span class="badge bg-success">&nbsp;</span> Normal</li>
