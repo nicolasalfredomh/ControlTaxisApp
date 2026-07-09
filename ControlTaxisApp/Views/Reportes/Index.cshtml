@@ -239,6 +239,7 @@
                     <tr>
                         <th>Fecha</th>
                         <th>Placa</th>
+                        <th>Tipo Mnatenimiento</th>
                         <th>Descripción</th>
                         <th>Costo</th>
                     </tr>
@@ -249,7 +250,8 @@
                         <tr>
                             <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
                             <td>@(item.IdVehiculoNavigation?.Placa ?? "N/A")</td>
-                            <td>@item.Descripcion</td>
+                            <td>@(item.TipoMantenimiento?.Nombre ?? "N/A")</td>
+                            <td>@item.Descripcion</td>                         
                                 <td>@item.Valor.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>
                         </tr>
                     }

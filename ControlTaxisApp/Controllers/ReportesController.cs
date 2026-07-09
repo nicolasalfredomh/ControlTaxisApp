@@ -26,7 +26,7 @@ namespace ControlTaxisApp.Controllers
 
             // 2. Definimos las consultas base
             var liquidacionesQuery = _context.LiquidacionesDiarias.Include(l => l.Vehiculo).AsQueryable();
-            var mantenimientosQuery = _context.Mantenimientos.Include(m => m.IdVehiculoNavigation).AsQueryable();
+            var mantenimientosQuery = _context.Mantenimientos.Include(m => m.IdVehiculoNavigation).Include(m => m.TipoMantenimiento).AsQueryable();
 
             // 3. Filtros básicos (se aplican siempre a la IQueryable)
             if (!string.IsNullOrEmpty(placaFiltro) && placaFiltro != "Todos")
@@ -119,7 +119,9 @@ namespace ControlTaxisApp.Controllers
             }
 
             // B. Filtramos Mantenimientos con los mismos criterios
-            var queryMant = _context.Mantenimientos.Include(m => m.IdVehiculoNavigation).AsQueryable();
+            var queryMant = _context.Mantenimientos.Include(m => m.IdVehiculoNavigation)
+                .Include(m => m.TipoMantenimiento)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(placaFiltro) && placaFiltro != "Todos")
                 queryMant = queryMant.Where(m => m.IdVehiculoNavigation != null && m.IdVehiculoNavigation.Placa == placaFiltro);
@@ -132,7 +134,7 @@ namespace ControlTaxisApp.Controllers
 
             // 3. Generar Excel solo con la lista filtrada
             var service = new ReporteService();
-            var fileBytes = service.GenerarExcel(listaLiquidaciones, listaMant);
+            var fileBytes = service.GenerarExcel(listaLiquidaciones, listaMant, listaFestivos);
 
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte_Liquidacion.xlsx");
         }
