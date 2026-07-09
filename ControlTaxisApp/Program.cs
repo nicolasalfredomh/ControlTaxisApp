@@ -1,9 +1,14 @@
 using ControlTaxisApp.Models;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var cultureInfo = new CultureInfo("es-CO");
+cultureInfo.NumberFormat.CurrencySymbol = "$"; // Asegura el símbolo de pesos
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 // --- 1. CONFIGURACIÓN DINÁMICA DE SQLite ---
 string dbPath;
 if (builder.Environment.IsProduction())

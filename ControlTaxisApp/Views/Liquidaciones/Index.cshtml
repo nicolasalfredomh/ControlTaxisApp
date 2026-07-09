@@ -147,7 +147,7 @@
                                 <td>@Html.DisplayFor(modelItem => item.Gastos)</td>
                                 <td>@Html.DisplayFor(modelItem => item.Ahorro)</td>
                                
-                                <td class="fw-bold text-primary">$@item.Saldo.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>
+                                <td class="fw-bold text-primary">@item.Saldo.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>
                                 <td>
                                     @{
                                         bool esDomingos = item.Fecha.DayOfWeek == DayOfWeek.Sunday;
