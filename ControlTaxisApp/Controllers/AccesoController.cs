@@ -16,13 +16,13 @@ namespace ControlTaxisApp.Controllers
             _context = context;
         }
 
-        [HttpGet] // Esto es para ver la página
+        [HttpGet] 
         public IActionResult Registro() { return View(); }
 
-        [HttpPost] // ESTO ES VITAL para que el botón funcione
+        [HttpPost]
         public IActionResult Registro(Usuario nuevoUsuario)
         {
-            // Pon un "punto de interrupción" (breakpoint) aquí en Visual Studio
+           
             // para ver si al dar clic en el botón, el código se detiene aquí.
             if (ModelState.IsValid)
             {

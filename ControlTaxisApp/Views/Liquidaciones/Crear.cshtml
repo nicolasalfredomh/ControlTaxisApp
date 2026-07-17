@@ -52,15 +52,21 @@
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Producción ($)</label>
-                            <input asp-for="Producido" id="producido" type="number" class="form-control" oninput="calcularSaldo()" />
+                            <input type="text" id="producidoVisual" class="form-control" oninput="formatearYCalcular(this, 'producidoReal')" />
+                            <input asp-for="Producido" id="producidoReal" type="hidden" />
                         </div>
+                        <!-- Campo Gastos -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Gastos ($)</label>
-                            <input asp-for="Gastos" id="gastos" type="number" class="form-control" oninput="calcularSaldo()" />
+                            <input type="text" id="gastosVisual" class="form-control" oninput="formatearYCalcular(this, 'gastosReal')" />
+                            <input asp-for="Gastos" id="gastosReal" type="hidden" />
                         </div>
+
+                        <!-- Campo Ahorro -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Ahorro ($)</label>
-                            <input asp-for="Ahorro" type="number" class="form-control" placeholder="0" />
+                            <input type="text" id="ahorroVisual" class="form-control" oninput="formatearSolo(this, 'ahorroReal')" />
+                            <input asp-for="Ahorro" id="ahorroReal" type="hidden" />
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Saldo Final ($)</label>
@@ -76,16 +82,38 @@
             </div>
         </div>
     </div>
-
     <script>
-        function calcularSaldo() {
-            const prod = parseFloat(document.getElementById('producido').value) || 0;
-            const gast = parseFloat(document.getElementById('gastos').value) || 0;
-            const saldo = prod - gast;
+            // Función para campos que SI afectan el saldo (Producción y Gastos)
+            function formatearYCalcular(input, idReal) {
+                formatearSolo(input, idReal); // Primero formatea
+                calcularSaldo();              // Luego recalcula el saldo
+            }
 
-            document.getElementById('saldoDisplay').value = saldo.toFixed(2);
-        }
+            // Función para formatear y guardar en el hidden (usada por todos)
+            function formatearSolo(input, idReal) {
+                let valorLimpio = input.value.replace(/\D/g, '');
+                document.getElementById(idReal).value = valorLimpio;
+
+                if (valorLimpio !== "") {
+                    input.value = new Intl.NumberFormat('es-CO').format(valorLimpio);
+                } else {
+                    input.value = "";
+                }
+            }
+
+            // Función de cálculo (Ahorro NO está aquí porque no debe afectar el saldo)
+            function calcularSaldo() {
+                const prod = parseFloat(document.getElementById('producidoReal').value) || 0;
+                const gast = parseFloat(document.getElementById('gastosReal').value) || 0;
+
+                const saldo = prod - gast;
+
+                document.getElementById('saldoDisplay').value = new Intl.NumberFormat('es-CO', {
+                    style: 'currency',
+                    currency: 'COP',
+                    maximumFractionDigits: 0
+                }).format(saldo);
+            }
     </script>
-
 </body>
 </html>

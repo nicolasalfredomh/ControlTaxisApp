@@ -1,0 +1,84 @@
+﻿@model ControlTaxisApp.Models.GastoAdministrativo
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+    // Lista de categorías basada en tu requerimiento
+    var categorias = new List<string> {
+        "Gastos Rodamiento", "Aplicaciones", "Rodamiento Preventivo",
+        "Soat", "Tecnomecanica", "Impuestos", "Cuota Pago Hernan",
+        "Multas Transito", "Gastos con conductor", "EPS",
+        "Targeton", "Tarjeta Operacion", "Seguros contra y extra"
+    };
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrar Gasto Administrativo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container my-5" style="max-width: 600px;">
+        <div class="card shadow-sm border-start border-primary border-5 mb-4">
+            <div class="card-body p-4">
+                <h3 class="fw-bold text-secondary mb-1">
+                    <i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i> Registrar Gasto
+                </h3>
+                <p class="text-muted small">Ingresa los detalles del gasto operativo o administrativo.</p>
+                <hr />
+
+                <form asp-action="Crear" method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Seleccionar Vehículo / Placa</label>
+                        <select asp-for="Placa" class="form-select" asp-items="ViewBag.Placas" required>
+                            <option value="">-- Seleccione una Placa --</option>
+                        </select>
+                        <span asp-validation-for="Placa" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Fecha del Gasto</label>
+                        <input asp-for="Fecha" type="date" class="form-control" required />
+                        <span asp-validation-for="Fecha" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Concepto / Categoría</label>
+                        <select asp-for="Concepto" class="form-select" required>
+                            <option value="">-- Seleccione un concepto --</option>
+                            @foreach (var cat in categorias)
+                            {
+                                <option value="@cat">@cat</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Concepto" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Observaciones</label>
+                        <textarea asp-for="Observaciones"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Ej: Pago de cuota quincenal, renovación de SOAT..."
+                                  style="resize: vertical;"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted">Valor del Gasto ($)</label>
+                        <input asp-for="Valor" type="number" step="0.01" class="form-control" required placeholder="Ej: 150000" />
+                        <span asp-validation-for="Valor" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar Registro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

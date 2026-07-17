@@ -10,72 +10,92 @@ namespace ControlTaxisApp.Controllers
     public class ReportesController : Controller
     {
         private readonly ControlTaxisContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ReportesController(ControlTaxisContext context)
+        public ReportesController(ControlTaxisContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
+        private string UserId => _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+
         public async Task<IActionResult> Index(string? placaFiltro, int? mes, int? anio, DateTime? fechaInicio,
-                                         DateTime? fechaFin, string? estadoFiltro, string? tipoDiaFiltro)
+                                 DateTime? fechaFin, string? estadoFiltro, string? tipoDiaFiltro)
         {
-            // 1. Carga de datos base
+            // 1. Instanciamos el modelo una sola vez
+            var model = new ReporteConsolidadoViewModel();
+
             var listaFestivos = await _context.Festivos.Select(f => f.Fecha.Date).ToListAsync();
             ViewBag.Festivos = listaFestivos;
-            ViewBag.Placas = await _context.Vehiculos.Select(v => new SelectListItem { Value = v.Placa, Text = v.Placa }).ToListAsync();
 
-            // 2. Definimos las consultas base
-            var liquidacionesQuery = _context.LiquidacionesDiarias.Include(l => l.Vehiculo).AsQueryable();
-            var mantenimientosQuery = _context.Mantenimientos.Include(m => m.IdVehiculoNavigation).Include(m => m.TipoMantenimiento).AsQueryable();
+            // Filtramos las placas disponibles solo para este usuario
+            ViewBag.Placas = await _context.Vehiculos
+                .Where(v => v.UsuarioId == UserId)
+                .Select(v => new SelectListItem { Value = v.Placa, Text = v.Placa })
+                .ToListAsync();
 
-            // 3. Filtros básicos (se aplican siempre a la IQueryable)
+            // 3. Consultas base filtradas por UsuarioId
+            var liquidacionesQuery = _context.LiquidacionesDiarias
+                .Include(l => l.Vehiculo)
+                .Where(l => l.Vehiculo != null && l.Vehiculo.UsuarioId == UserId)
+                .AsQueryable();
+
+            var mantenimientosQuery = _context.Mantenimientos
+                .Include(m => m.IdVehiculoNavigation)
+                .Include(m => m.TipoMantenimiento)
+                .Where(m => m.IdVehiculoNavigation != null && m.IdVehiculoNavigation.UsuarioId == UserId)
+                .AsQueryable();
+
+            var gastosQuery = _context.GastosAdministrativos
+                .Where(g => _context.Vehiculos.Any(v => v.Placa == g.Placa && v.UsuarioId == UserId))
+                .AsQueryable();
+           
+            // 4. Aplicar filtros a todas las tablas
             if (!string.IsNullOrEmpty(placaFiltro) && placaFiltro != "Todos")
             {
                 liquidacionesQuery = liquidacionesQuery.Where(l => l.Vehiculo != null && l.Vehiculo.Placa == placaFiltro);
                 mantenimientosQuery = mantenimientosQuery.Where(m => m.IdVehiculoNavigation != null && m.IdVehiculoNavigation.Placa == placaFiltro);
+                gastosQuery = gastosQuery.Where(g => g.Placa == placaFiltro); // <-- Filtro de gastos
             }
-            if (mes.HasValue)
-            {
-                liquidacionesQuery = liquidacionesQuery.Where(l => l.Fecha.Month == mes);
-                mantenimientosQuery = mantenimientosQuery.Where(m => m.Fecha.Month == mes);
-            }
+            // FILTRO AÑO (Faltaba)
             if (anio.HasValue)
             {
-                liquidacionesQuery = liquidacionesQuery.Where(l => l.Fecha.Year == anio);
-                mantenimientosQuery = mantenimientosQuery.Where(m => m.Fecha.Year == anio);
+                liquidacionesQuery = liquidacionesQuery.Where(l => l.Fecha.Year == anio.Value);
+                mantenimientosQuery = mantenimientosQuery.Where(m => m.Fecha.Year == anio.Value);
+                gastosQuery = gastosQuery.Where(g => g.Fecha.Year == anio.Value);
             }
+
+            // FILTRO FECHAS (Faltaba)
             if (fechaInicio.HasValue && fechaFin.HasValue)
             {
                 liquidacionesQuery = liquidacionesQuery.Where(l => l.Fecha.Date >= fechaInicio.Value.Date && l.Fecha.Date <= fechaFin.Value.Date);
                 mantenimientosQuery = mantenimientosQuery.Where(m => m.Fecha.Date >= fechaInicio.Value.Date && m.Fecha.Date <= fechaFin.Value.Date);
+                gastosQuery = gastosQuery.Where(g => g.Fecha.Date >= fechaInicio.Value.Date && g.Fecha.Date <= fechaFin.Value.Date);
             }
-
-            // 4. Aplicar Filtro de Estado (Manual)
-            if (!string.IsNullOrEmpty(estadoFiltro) && estadoFiltro != "Todos")
+            // ... (mantén tus filtros de mes, año y fecha igual, aplicándolos también a gastosQuery) ...
+            if (mes.HasValue)
             {
-                liquidacionesQuery = liquidacionesQuery.Where(l => l.EstadoDia == estadoFiltro);
+                liquidacionesQuery = liquidacionesQuery.Where(l => l.Fecha.Month == mes);
+                mantenimientosQuery = mantenimientosQuery.Where(m => m.Fecha.Month == mes);
+                gastosQuery = gastosQuery.Where(g => g.Fecha.Month == mes);
             }
 
-            // 5. Ejecutamos la consulta para obtener los datos
-            var listaLiquidaciones = await liquidacionesQuery.ToListAsync();
-            var listaMantenimientos = await mantenimientosQuery.ToListAsync();
+            // 5. Ejecutar consultas
+            model.Liquidaciones = await liquidacionesQuery.ToListAsync();
+            model.Mantenimientos = await mantenimientosQuery.ToListAsync();
+            model.GastosAdministrativos = await gastosQuery.ToListAsync(); 
 
-            // 6. Aplicar Filtro de Tipo de Día (Lógica basada en fecha, se hace en memoria)
+            // 6. Lógica de tipo día (se mantiene igual para las liquidaciones)
             if (!string.IsNullOrEmpty(tipoDiaFiltro) && tipoDiaFiltro != "Todos")
             {
                 if (tipoDiaFiltro == "Festivo")
-                    listaLiquidaciones = listaLiquidaciones.Where(l => listaFestivos.Contains(l.Fecha.Date)).ToList();
+                    model.Liquidaciones = model.Liquidaciones.Where(l => listaFestivos.Contains(l.Fecha.Date)).ToList();
                 else if (tipoDiaFiltro == "Domingo")
-                    listaLiquidaciones = listaLiquidaciones.Where(l => l.Fecha.DayOfWeek == DayOfWeek.Sunday).ToList();
+                    model.Liquidaciones = model.Liquidaciones.Where(l => l.Fecha.DayOfWeek == DayOfWeek.Sunday).ToList();
                 else if (tipoDiaFiltro == "Habil")
-                    listaLiquidaciones = listaLiquidaciones.Where(l => l.Fecha.DayOfWeek != DayOfWeek.Sunday && !listaFestivos.Contains(l.Fecha.Date)).ToList();
+                    model.Liquidaciones = model.Liquidaciones.Where(l => l.Fecha.DayOfWeek != DayOfWeek.Sunday && !listaFestivos.Contains(l.Fecha.Date)).ToList();
             }
-
-            var model = new ReporteConsolidadoViewModel
-            {
-                Liquidaciones = listaLiquidaciones,
-                Mantenimientos = listaMantenimientos
-            };
 
             return View(model);
         }

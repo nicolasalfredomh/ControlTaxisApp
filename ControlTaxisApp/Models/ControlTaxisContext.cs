@@ -19,6 +19,8 @@ namespace ControlTaxisApp.Models
         public DbSet<Festivo> Festivos { get; set; }
         // public IEnumerable TiposMantenimiento { get; internal set; }
 
+        public DbSet<GastoAdministrativo> GastosAdministrativos { get; set; }
+
         // === SÚPER IMPORTANTE: AGREGA ESTE BLOQUE AQUÍ ===
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,16 +35,22 @@ namespace ControlTaxisApp.Models
 
 
             modelBuilder.Entity<TipoMantenimiento>().HasData(
-        new TipoMantenimiento { Id = 1, Nombre = "Motor" },
-        new TipoMantenimiento { Id = 2, Nombre = "Caja de Cambios" },
-        new TipoMantenimiento { Id = 3, Nombre = "Frenos" },
-        new TipoMantenimiento { Id = 4, Nombre = "Suspensión" },
-        new TipoMantenimiento { Id = 5, Nombre = "Sistema Eléctrico" },
-        new TipoMantenimiento { Id = 6, Nombre = "Llantas" },
-        new TipoMantenimiento { Id = 7, Nombre = "Cambio de Aceite" },
-        new TipoMantenimiento { Id = 8, Nombre = "Aire Acondicionado" },
-        new TipoMantenimiento { Id = 9, Nombre = "Otro" }
-    );
+       new TipoMantenimiento { Id = 1, Nombre = "Motor" },
+       new TipoMantenimiento { Id = 2, Nombre = "Caja de Cambios" },
+       new TipoMantenimiento { Id = 3, Nombre = "Suspensión" },
+       new TipoMantenimiento { Id = 4, Nombre = "Sistema Eléctrico" },
+       new TipoMantenimiento { Id = 5, Nombre = "Cambio de Aceite" },
+       new TipoMantenimiento { Id = 6, Nombre = "Frenos" },
+       new TipoMantenimiento { Id = 7, Nombre = "Cambio Correa Rep." },
+       new TipoMantenimiento { Id = 8, Nombre = "Cambio Correa Dite" },
+       new TipoMantenimiento { Id = 9, Nombre = "Alternador" },
+       new TipoMantenimiento { Id = 10, Nombre = "Rayador" },
+       new TipoMantenimiento { Id = 11, Nombre = "Closh" },
+       new TipoMantenimiento { Id = 12, Nombre = "Pintura" },
+       new TipoMantenimiento { Id = 13, Nombre = "Llantas" },
+       new TipoMantenimiento { Id = 14, Nombre = "Batería" },
+       new TipoMantenimiento { Id = 15, Nombre = "Otro" }
+   );
 
         }
     }

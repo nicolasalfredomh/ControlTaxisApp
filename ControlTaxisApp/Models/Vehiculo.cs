@@ -10,5 +10,7 @@ namespace ControlTaxisApp.Models
         public int Id { get; set; }
         public string Placa { get; set; } = null!;
         public string? Modelo { get; set; }
+
+        public string? UsuarioId { get; set; }
     }
 }

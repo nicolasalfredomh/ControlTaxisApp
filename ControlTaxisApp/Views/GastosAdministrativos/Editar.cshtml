@@ -1,0 +1,67 @@
+﻿@model ControlTaxisApp.Models.GastoAdministrativo
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+    var categorias = new List<string> {
+        "Gastos Rodamiento", "Aplicaciones", "Rodamiento Preventivo",
+        "Soat", "Tecnomecanica", "Impuestos", "Cuota Pago Hernan",
+        "Multas Transito", "Gastos con conductor", "EPS",
+        "Targeton", "Tarjeta Operacion", "Seguros contra y extra"
+    };
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Gasto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light p-5">
+    <div class="container" style="max-width: 600px;">
+        <div class="card shadow p-4 border-start border-primary border-5">
+            <h3 class="mb-4"><i class="fa-solid fa-pen text-primary me-2"></i> Editar Registro de Gasto</h3>
+
+            <form asp-action="Editar" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Vehículo / Placa</label>
+                    <select asp-for="Placa" class="form-select" asp-items="ViewBag.Placas" required></select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Fecha</label>
+                    <input asp-for="Fecha" type="date" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Concepto" class="form-label fw-bold">Concepto / Categoría</label>
+                    <select asp-for="Concepto" class="form-select" required>
+                        @foreach (var cat in categorias)
+                        {
+                            <option value="@cat" selected="@(Model.Concepto == cat ? "selected" : null)">@cat</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Observaciones" class="form-label fw-bold">Observaciones</label>
+                    <textarea asp-for="Observaciones" class="form-control" rows="3" style="resize: vertical;"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Valor ($)</label>
+                    <input asp-for="Valor" type="number" step="0.01" class="form-control" required />
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

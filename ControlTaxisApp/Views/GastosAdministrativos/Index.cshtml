@@ -1,0 +1,97 @@
+﻿@model IEnumerable<ControlTaxisApp.Models.GastoAdministrativo>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+    // Lista de categorías basada en tu lista manuscrita
+    var categorias = new List<string> { "Gastos Rodamiento", "Aplicaciones", "Rodamiento Preventivo", "Soat", "Tecnomecanica", "Impuestos", "Cuota Pago Hernan", "Multas Transito", "Gastos con conductor", "EPS", "Targeton", "Tarjeta Operacion", "Seguros contra y extra" };
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gastos Administrativos y Operativos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container my-5">
+        <div class="card shadow-sm p-5 border-start border-primary border-5 mb-4">
+            <h2 class="fw-bold text-secondary">
+                <i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i> Control de Gastos Administrativos
+            </h2>
+            <p class="text-muted">Registro detallado de SOAT, impuestos, seguros, gastos de conductor y otros conceptos operativos.</p>
+            <hr />
+            <div class="d-flex justify-content-between">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Volver al Inicio
+                </a>
+                <a asp-controller="GastosAdministrativos" asp-action="Crear" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus me-1"></i> Registrar Nuevo Gasto
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <form asp-action="Index" method="get" class="row g-3 mb-4 align-items-end">
+            <div class="col-auto">
+                <label class="form-label fw-bold small text-muted">Filtrar por Placa:</label>
+                <!-- asp-items hace todo el trabajo de generar los <option> automáticamente -->
+                <select name="placaFiltro" asp-items="ViewBag.Placas" class="form-select">
+                    <option value="">-- Todas --</option>
+                </select>
+            </div>
+
+            <div class="col-auto">
+                <label class="form-label fw-bold small text-muted">Categoría:</label>
+                <select name="categoriaFiltro" class="form-select">
+                    <option value="">-- Todas --</option>
+                    @foreach (var cat in categorias)
+                    {
+                        <option value="@cat" selected="@(cat == Context.Request.Query["categoriaFiltro"] ? "selected" : null)">@cat</option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary btn-sm mt-4"><i class="fa-solid fa-filter"></i> Filtrar</button>
+               
+            </div>
+        </form>
+
+        <div class="card shadow-sm p-4">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Placa</th>
+                            <th>Concepto</th>
+                            <th>Descripción</th>
+                            <th>Valor ($)</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td><span class="badge bg-info text-dark">@item.Placa</span></td>
+                                <td>@item.Concepto</td>
+                                <td>@item.Observaciones</td>
+                                <td class="fw-bold text-danger">$@item.Valor.ToString("N0")</td>
+                                <td class="text-center">
+                                    <a asp-action="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></a>
+                                    <form asp-action="Eliminar" asp-route-id="@item.Id" method="post" onsubmit="return confirm('¿Eliminar este registro?');" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

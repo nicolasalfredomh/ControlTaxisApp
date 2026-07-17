@@ -3,6 +3,7 @@ using System;
 using ControlTaxisApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ControlTaxisApp.Migrations
 {
     [DbContext(typeof(ControlTaxisContext))]
-    partial class ControlTaxisContextModelSnapshot : ModelSnapshot
+    [Migration("20260714160943_MigracionActualizacionFlota")]
+    partial class MigracionActualizacionFlota
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
@@ -67,10 +70,6 @@ namespace ControlTaxisApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Observaciones")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Placa")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -202,66 +201,36 @@ namespace ControlTaxisApp.Migrations
                         new
                         {
                             Id = 3,
-                            Nombre = "Suspensión"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Nombre = "Sistema Eléctrico"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Nombre = "Cambio de Aceite"
-                        },
-                        new
-                        {
-                            Id = 6,
                             Nombre = "Frenos"
                         },
                         new
                         {
-                            Id = 7,
-                            Nombre = "Cambio Correa Rep."
+                            Id = 4,
+                            Nombre = "Suspensión"
                         },
                         new
                         {
-                            Id = 8,
-                            Nombre = "Cambio Correa Dite"
+                            Id = 5,
+                            Nombre = "Sistema Eléctrico"
                         },
                         new
                         {
-                            Id = 9,
-                            Nombre = "Alternador"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Nombre = "Rayador"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Nombre = "Closh"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Nombre = "Pintura"
-                        },
-                        new
-                        {
-                            Id = 13,
+                            Id = 6,
                             Nombre = "Llantas"
                         },
                         new
                         {
-                            Id = 14,
-                            Nombre = "Batería"
+                            Id = 7,
+                            Nombre = "Cambio de Aceite"
                         },
                         new
                         {
-                            Id = 15,
+                            Id = 8,
+                            Nombre = "Aire Acondicionado"
+                        },
+                        new
+                        {
+                            Id = 9,
                             Nombre = "Otro"
                         });
                 });
@@ -300,9 +269,6 @@ namespace ControlTaxisApp.Migrations
 
                     b.Property<string>("Placa")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UsuarioId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

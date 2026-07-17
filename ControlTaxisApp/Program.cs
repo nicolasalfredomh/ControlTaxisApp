@@ -4,7 +4,8 @@ using OfficeOpenXml;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<VehiculoService>();
 var cultureInfo = new CultureInfo("es-CO");
 cultureInfo.NumberFormat.CurrencySymbol = "$"; // Asegura el símbolo de pesos
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

@@ -248,12 +248,40 @@
                     @foreach (var item in Model.Mantenimientos)
                     {
                         <tr>
-                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
-                            <td>@(item.IdVehiculoNavigation?.Placa ?? "N/A")</td>
+                            <td>  <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small> 
+                                <span class="text-muted">@item.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES")).ToUpper()</span>
+                            </td>
+                            <td>  <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6"> @(item.IdVehiculoNavigation?.Placa ?? "N/A")</span></td>
                             <td>@(item.TipoMantenimiento?.Nombre ?? "N/A")</td>
                             <td>@item.Descripcion</td>                         
-                                <td>@item.Valor.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>
+                            <td>@item.Valor.ToString("C0", new System.Globalization.CultureInfo("es-CO"))</td>
                         </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h4>Gastos Administrativos</h4>
+            <table id="tablaAdministrativos" class="table table-hover border w-100">
+                <thead class="table-light">
+                    <tr>
+                    <th>Fecha</th>
+                    <th>Placa</th>
+                    <th>Concepto</th>
+                    <th>Descripción</th>
+                    <th>Costo</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.GastosAdministrativos)
+                    {
+                        <tr>
+                            <td>
+                                <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
+                                <span class="text-muted">@item.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES")).ToUpper()</span>
+                            </td>
+                            <td>  <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">@item.Placa</span></td>
+                            <td>@item.Concepto</td><td>@item.Observaciones</td>
+                            <td>@item.Valor.ToString("C0", new CultureInfo("es-CO"))</td></tr>
                     }
                 </tbody>
             </table>
@@ -269,6 +297,10 @@
                             "pageLength": 10,
                             "language": { "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json" }
                         });
+                                                 $('#tablaAdministrativos').DataTable({
+                                        "pageLength": 10,
+                                        "language": { "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json" }
+                                    });
                     });
                 </script>
             }

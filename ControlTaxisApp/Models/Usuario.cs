@@ -12,5 +12,8 @@ namespace ControlTaxisApp.Models
         public string NombreUsuario { get; set; } = null!;
         public string Clave { get; set; } = null!;
         public string NombreCompleto { get; set; } = null!;
+
+  
+
     }
 }
