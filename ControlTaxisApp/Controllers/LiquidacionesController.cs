@@ -224,5 +224,84 @@ namespace ControlTaxisApp.Controllers
         }
 
 
+
+        [HttpPost]
+        public async Task<IActionResult> ImportarLiquidaciones(IFormFile archivoExcel)
+        {
+            if (archivoExcel == null || archivoExcel.Length == 0)
+                return Content("Error: No se ha seleccionado ningún archivo.");
+
+            try
+            {
+                using (var package = new ExcelPackage(archivoExcel.OpenReadStream()))
+                {
+                    // Recorremos TODAS las hojas del archivo
+                    foreach (var worksheet in package.Workbook.Worksheets)
+                    {
+                        string nombreHoja = worksheet.Name.Trim().ToUpper();
+
+                        // Buscamos el vehículo específico para esta hoja
+                        var vehiculo = _context.Vehiculos.FirstOrDefault(v => v.Placa.ToUpper() == nombreHoja);
+
+                        if (vehiculo == null) continue; // Si no existe la placa, saltamos esta hoja
+
+                        int rowCount = worksheet.Dimension.Rows;
+
+                        for (int row = 3; row <= rowCount; row++) // Tus datos empiezan en fila 3 según la imagen
+                        {
+                            var celdaFecha = worksheet.Cells[row, 1].Value?.ToString();
+
+                            // Saltamos encabezados o filas vacías
+                            if (string.IsNullOrEmpty(celdaFecha) || celdaFecha.Trim().ToUpper() == "FECHA") continue;
+
+                            if (!DateTime.TryParse(celdaFecha, out DateTime fecha)) continue;
+
+                            var estadoRaw = worksheet.Cells[row, 3].Value?.ToString()?.ToUpper() ?? "NORMAL";
+
+                            // Limpiamos los valores decimales (eliminando puntos de miles si existen)
+                            var producido = ParseDecimal(worksheet.Cells[row, 4].Value);
+                            var gastos = ParseDecimal(worksheet.Cells[row, 5].Value);
+                            var ahorro = ParseDecimal(worksheet.Cells[row, 6].Value);
+
+                            string estadoFinal = estadoRaw switch
+                            {
+                                "PICO Y PLACA" => "PICO_Y_PLACA",
+                                "TALLER" => "TALLER",
+                                _ => "NORMAL"
+                            };
+
+                            var liquidacion = new LiquidacionDiaria
+                            {
+                                VehiculoId = vehiculo.Id,
+                                Fecha = fecha,
+                                Producido = producido,
+                                Gastos = gastos,
+                                Ahorro = ahorro,
+                                Saldo = producido - gastos ,
+                                EstadoDia = estadoFinal
+                            };
+
+                            _context.LiquidacionesDiarias.Add(liquidacion);
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+                   
+                }
+            }
+            catch (Exception ex)
+            {
+                return Content($"Error crítico: {ex.Message}");
+            }
+        }
+
+        // Método auxiliar para limpiar números como "95.000"
+        private decimal ParseDecimal(object value)
+        {
+            if (value == null) return 0;
+            string str = value.ToString().Replace(".", "").Replace(",", ".");
+            return decimal.TryParse(str, out decimal result) ? result : 0;
+        }
+
+
     }
 }

@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for controltaxisapp on 2026-07-05T11:37:30-05:00
+# fly.toml app configuration file generated for controltaxisapp on 2026-07-17T18:29:25-05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -16,15 +16,12 @@ primary_region = 'lax'
 [http_service]
   internal_port = 8080
   force_https = true
-  # CAMBIO: Establecemos el tiempo de espera antes de que se apague
-  # Si nadie entra en 15 minutos, se apaga.
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  # CAMBIO: Mantenemos al menos 1 máquina encendida para que responda al instante
   min_machines_running = 0
   processes = ['app']
 
-[vm]
+[[vm]]
   memory = '2gb'
-  cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 2048

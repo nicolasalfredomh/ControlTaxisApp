@@ -47,7 +47,7 @@ using (var scope = app.Services.CreateScope())
 { 
     var db = scope.ServiceProvider.GetRequiredService<ControlTaxisContext>();
     db.Database.Migrate();
- 
+
 }
 
 // --- 5. PIPELINE HTTP ---
