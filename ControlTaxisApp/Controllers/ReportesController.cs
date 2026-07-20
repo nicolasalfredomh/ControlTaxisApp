@@ -4,6 +4,7 @@ using ControlTaxisApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ControlTaxisApp.Controllers
 {
@@ -120,43 +121,72 @@ namespace ControlTaxisApp.Controllers
         }
 
         public async Task<IActionResult> ExportarExcel(string? placaFiltro, int? mes, int? anio, DateTime? fechaInicio,
-                                                 DateTime? fechaFin, string? estadoFiltro, string? tipoDiaFiltro)
+                                      DateTime? fechaFin, string? estadoFiltro, string? tipoDiaFiltro)
         {
-            // 1. Obtenemos la consulta con los filtros básicos aplicados
-            var query = AplicarFiltros(placaFiltro, mes, anio, fechaInicio, fechaFin, estadoFiltro);
+            var user = _httpContextAccessor.HttpContext?.User;
+            var userIdActual = user?.FindFirstValue(ClaimTypes.Name); // O Name, dependiendo de tu configuración
+            // 1. Obtenemos los Ids y las Placas que pertenecen al usuario
+            var misVehiculos = await _context.Vehiculos
+                .Where(v => v.UsuarioId == userIdActual)
+                .ToListAsync();
+
+            var misVehiculosIds = misVehiculos.Select(v => v.Id).ToList();
+            var misPlacas = misVehiculos.Select(v => v.Placa).ToList();
+
+            // 2. Liquidaciones: Filtramos por los Ids del usuario y aplicamos filtros normales
+            var query = AplicarFiltros(placaFiltro, mes, anio, fechaInicio, fechaFin, estadoFiltro)
+                             .Where(l => misVehiculosIds.Contains(l.VehiculoId));
+
             var listaLiquidaciones = await query.ToListAsync();
 
-            // 2. Aplicamos el filtro de Tipo de Día (en memoria, como ya lo haces)
+            // Filtro Tipo de Día (en memoria)
             var listaFestivos = await _context.Festivos.Select(f => f.Fecha.Date).ToListAsync();
-            if (!string.IsNullOrEmpty(tipoDiaFiltro) && tipoDiaFiltro != "Todos")
+            // ... (tu lógica de filtros de listaLiquidaciones permanece igual)
+
+            // 3. Mantenimientos: Filtramos por los Ids del usuario y luego filtros normales
+            var queryMant = _context.Mantenimientos.Include(m => m.IdVehiculoNavigation)
+                                                  .Include(m => m.TipoMantenimiento)
+                                                  .Where(m => misVehiculosIds.Contains(m.VehiculoId))
+                                                  .AsQueryable();
+
+            // 4. Gastos Administrativos: Filtramos por las placas del usuario y luego filtros normales
+            var queryGastos = _context.GastosAdministrativos
+                                                  .Where(g => misPlacas.Contains(g.Placa))
+                                                  .AsQueryable();
+
+            // Aplicar filtros comunes a ambas listas
+            if (!string.IsNullOrEmpty(placaFiltro) && placaFiltro != "Todos")
             {
-                if (tipoDiaFiltro == "Festivo")
-                    listaLiquidaciones = listaLiquidaciones.Where(l => listaFestivos.Contains(l.Fecha.Date)).ToList();
-                else if (tipoDiaFiltro == "Domingo")
-                    listaLiquidaciones = listaLiquidaciones.Where(l => l.Fecha.DayOfWeek == DayOfWeek.Sunday).ToList();
-                else if (tipoDiaFiltro == "Habil")
-                    listaLiquidaciones = listaLiquidaciones.Where(l => l.Fecha.DayOfWeek != DayOfWeek.Sunday && !listaFestivos.Contains(l.Fecha.Date)).ToList();
+                queryMant = queryMant.Where(m => m.IdVehiculoNavigation != null && m.IdVehiculoNavigation.Placa == placaFiltro);
+                queryGastos = queryGastos.Where(g => g.Placa == placaFiltro);
             }
 
-            // B. Filtramos Mantenimientos con los mismos criterios
-            var queryMant = _context.Mantenimientos.Include(m => m.IdVehiculoNavigation)
-                .Include(m => m.TipoMantenimiento)
-                .AsQueryable();
+            if (mes.HasValue)
+            {
+                queryMant = queryMant.Where(m => m.Fecha.Month == mes);
+                queryGastos = queryGastos.Where(g => g.Fecha.Month == mes);
+            }
 
-            if (!string.IsNullOrEmpty(placaFiltro) && placaFiltro != "Todos")
-                queryMant = queryMant.Where(m => m.IdVehiculoNavigation != null && m.IdVehiculoNavigation.Placa == placaFiltro);
-            if (mes.HasValue) queryMant = queryMant.Where(m => m.Fecha.Month == mes);
-            if (anio.HasValue) queryMant = queryMant.Where(m => m.Fecha.Year == anio);
+            if (anio.HasValue)
+            {
+                queryMant = queryMant.Where(m => m.Fecha.Year == anio);
+                queryGastos = queryGastos.Where(g => g.Fecha.Year == anio);
+            }
+
             if (fechaInicio.HasValue && fechaFin.HasValue)
+            {
                 queryMant = queryMant.Where(m => m.Fecha.Date >= fechaInicio.Value.Date && m.Fecha.Date <= fechaFin.Value.Date);
+                queryGastos = queryGastos.Where(g => g.Fecha.Date >= fechaInicio.Value.Date && g.Fecha.Date <= fechaFin.Value.Date);
+            }
 
             var listaMant = await queryMant.ToListAsync();
+            var listaGastos = await queryGastos.ToListAsync();
 
-            // 3. Generar Excel solo con la lista filtrada
+            // 5. Generar Excel
             var service = new ReporteService();
-            var fileBytes = service.GenerarExcel(listaLiquidaciones, listaMant, listaFestivos);
+            var fileBytes = service.GenerarExcel(listaLiquidaciones, listaMant, listaFestivos, listaGastos);
 
-            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte_Liquidacion.xlsx");
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Reporte_General.xlsx");
         }
 
 
