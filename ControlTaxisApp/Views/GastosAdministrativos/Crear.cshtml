@@ -65,10 +65,15 @@
                                   style="resize: vertical;"></textarea>
                         <span asp-validation-for="Observaciones" class="text-danger small"></span>
                     </div>
-
                     <div class="mb-4">
                         <label class="form-label fw-bold text-muted">Valor del Gasto ($)</label>
-                        <input asp-for="Valor" type="number" step="0.01" class="form-control" required placeholder="Ej: 150000" />
+
+                        <!-- Input visual que muestra los puntos de miles -->
+                        <input type="text" id="inputGastoVisual" class="form-control" required placeholder="Ej: 150.000" autocomplete="off" />
+
+                        <!-- Input oculto que mapea con el modelo (asp-for="Valor") y envía el número plano -->
+                        <input asp-for="Valor" type="hidden" id="GastoReal" />
+
                         <span asp-validation-for="Valor" class="text-danger small"></span>
                     </div>
 
@@ -80,5 +85,29 @@
             </div>
         </div>
     </div>
+    <script>
+                       const inputGastoVisual = document.getElementById('inputGastoVisual');
+            const gastoReal = document.getElementById('GastoReal');
+
+            // Si ya hay un valor cargado (modo edición)
+            if (gastoReal.value) {
+                let numero = parseFloat(gastoReal.value);
+                if (!isNaN(numero)) {
+                    inputGastoVisual.value = numero.toLocaleString('es-CO');
+                }
+            }
+
+            inputGastoVisual.addEventListener('input', function (e) {
+                let valorLimpio = this.value.replace(/\D/g, '');
+
+                if (valorLimpio) {
+                    gastoReal.value = valorLimpio;
+                    inputGastoVisual.value = Number(valorLimpio).toLocaleString('es-CO');
+                } else {
+                    gastoReal.value = '';
+                    inputGastoVisual.value = '';
+                }
+            });
+    </script>
 </body>
 </html>

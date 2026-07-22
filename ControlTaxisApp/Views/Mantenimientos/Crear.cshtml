@@ -56,7 +56,13 @@
 
                     <div class="mb-4">
                         <label class="form-label fw-bold text-muted">Costo del Trabajo ($)</label>
-                        <input asp-for="Valor" type="number" step="0.01" class="form-control" required placeholder="Ej: 180000" />
+
+                        <!-- Input visual que muestra los puntos de miles -->
+                        <input type="text" id="inputValorVisual" class="form-control" required placeholder="Ej: 180,000" autocomplete="off" />
+
+                        <!-- Input oculto que mapea exactamente con tu modelo (asp-for="Valor") y envía el número plano -->
+                        <input asp-for="Valor" type="hidden" id="ValorReal" />
+
                         <span asp-validation-for="Valor" class="text-danger small"></span>
                     </div>
                     <div class="row">
@@ -93,5 +99,37 @@
             </div>
         </div>
     </div>
+
+        <script>
+                const inputVisual = document.getElementById('inputValorVisual');
+                const inputReal = document.getElementById('ValorReal');
+
+                // Si ya hay un valor cargado (por ejemplo, al editar un registro), lo formateamos al iniciar
+                if (inputReal.value) {
+                    let numero = parseFloat(inputReal.value);
+                    if (!isNaN(numero)) {
+                    inputVisual.value = numero.toLocaleString('es-CO'); // Usa comas para miles (puedes cambiar a 'es-CO' si prefieres puntos)
+                    }
+                }
+
+                inputVisual.addEventListener('input', function (e) {
+                    // 1. Quitamos todo lo que no sea números
+                    let valorLimpio = this.value.replace(/\D/g, '');
+
+                    if (valorLimpio) {
+                        // 2. Convertimos a número para pasarlo al input real (sin puntos ni formatos)
+                        inputReal.value = valorLimpio;
+
+                        // 3. Formateamos visualmente con separadores de miles para el usuario
+                    inputVisual.value = Number(valorLimpio).toLocaleString('es-CO');
+                    } else {
+                        inputReal.value = '';
+                        inputVisual.value = '';
+                    }
+                });
+        </script>
+    
+
+
 </body>
 </html>

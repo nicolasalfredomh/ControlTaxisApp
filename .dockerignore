@@ -5,3 +5,8 @@
 **/*.db
 **/*.db-journal
 fly.toml
+.git/
+.vscode/
+node_modules/
+*.user
+*.lock
