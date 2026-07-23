@@ -162,7 +162,7 @@
                             }
                         }
                         <tr class="@filaClase" style="@estiloFila">
-                            <td>
+                            <td data-order="@item.Fecha.ToString("yyyy-MM-dd")">
                                 <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
                                 <span class="text-muted">@item.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES")).ToUpper()</span>
                             </td>
@@ -248,7 +248,8 @@
                     @foreach (var item in Model.Mantenimientos)
                     {
                         <tr>
-                            <td>  <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small> 
+                            <td data-order="@item.Fecha.ToString("yyyy-MM-dd")">
+                                <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small> 
                                 <span class="text-muted">@item.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES")).ToUpper()</span>
                             </td>
                             <td>  <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6"> @(item.IdVehiculoNavigation?.Placa ?? "N/A")</span></td>
@@ -275,7 +276,7 @@
                     @foreach (var item in Model.GastosAdministrativos)
                     {
                         <tr>
-                            <td>
+                            <td data-order="@item.Fecha.ToString("yyyy-MM-dd")">
                                 <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
                                 <span class="text-muted">@item.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES")).ToUpper()</span>
                             </td>
@@ -291,14 +292,17 @@
                     $(document).ready(function () {
                         $('#tablaLiquidaciones').DataTable({
                             "pageLength": 10,
+                                        "order": [[0, "desc"]],
                             "language": { "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json" }
                         });
                         $('#tablaMantenimientos').DataTable({
                             "pageLength": 10,
+                                        "order": [[0, "desc"]],
                             "language": { "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json" }
                         });
                                                  $('#tablaAdministrativos').DataTable({
                                         "pageLength": 10,
+                                        "order": [[0, "desc"]],
                                         "language": { "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json" }
                                     });
                     });

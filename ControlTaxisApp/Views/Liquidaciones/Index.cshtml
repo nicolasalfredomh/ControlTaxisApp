@@ -135,7 +135,7 @@
                             bool tieneRestriccion = item.Vehiculo != null && ControlTaxisApp.Services.PicoYPlacaService.TienePicoYPlaca(item.Vehiculo.Placa, DateTime.Now);
                            
                             <tr class="@filaClase" style="@estiloFila">
-                                <td>
+                                <td data-order="@item.Fecha.ToString("yyyy-MM-dd")">
                                     <small class="d-block fw-bold">@item.Fecha.ToString("dd/MM/yyyy")</small>
                                     <span class="text-muted">@item.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES")).ToUpper()</span>
                                 </td>
@@ -233,10 +233,11 @@
             $(document).ready(function () {
                 $('#tablaLiquidaciones').DataTable({
                     "pageLength": 10, // Cantidad de registros por página
+                    "order": [[0, "desc"]],
                     "language": {
                         "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
                     },
-                    "order": [[0, "desc"]] // Ordenar por la primera columna (Fecha) de forma descendente
+                    
                 });
             });
     </script>

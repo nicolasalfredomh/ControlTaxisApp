@@ -19,7 +19,7 @@ namespace ControlTaxisApp.Controllers
         {
             _context = context;
             _userId = httpContextAccessor.HttpContext?.User.Identity?.Name;
-            Console.WriteLine($"DEBUG: Usuario logueado detectado como: {_userId}");
+          
             var meses = new[]
             {
     new { Valor = 1, Nombre = "Enero" },

@@ -98,7 +98,7 @@
                             foreach (var item in Model)
                             {
                                 <tr>
-                                    <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                    <td data-order="@item.Fecha.ToString("yyyy-MM-dd")">@item.Fecha.ToString("dd/MM/yyyy")</td>
                                     <td><span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">@item.IdVehiculoNavigation?.Placa</span></td>
                                     <td>@item.TipoMantenimiento?.Nombre</td>
                                     <td>@item.Descripcion</td>
