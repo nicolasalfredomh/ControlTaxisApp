@@ -31,15 +31,19 @@
                             <div class="mb-2">
                                 @if (!string.IsNullOrEmpty(Model.FotoUrl))
                                 {
-                                    <img src="@Model.FotoUrl" alt="Foto Conductor" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" />
+                                    <!-- Agregamos id="fotoPreview" -->
+                                    <img id="fotoPreview" src="@Model.FotoUrl" alt="Foto Conductor" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" />
                                 }
                                 else
                                 {
-                                    <img src="https://via.placeholder.com/120?text=Sin+Foto" alt="Sin Foto" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" />
+                                    <!-- Agregamos id="fotoPreview" -->
+                                    <img id="fotoPreview" src="https://via.placeholder.com/120?text=Sin+Foto" alt="Sin Foto" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" />
                                 }
                             </div>
                             <label class="btn btn-outline-secondary btn-sm">
-                                <i class="fa-solid fa-camera"></i> Subir Foto <input type="file" name="archivoFoto" class="d-none" accept="image/*" />
+                                <!-- Agregamos id="inputFoto" -->
+                                <i class="fa-solid fa-camera"></i> Subir Foto
+                                <input type="file" id="inputFoto" name="archivoFoto" class="d-none" accept="image/*" />
                             </label>
                         </div>
                         <div class="col-md-8">
@@ -79,5 +83,18 @@
             </div>
         </div>
     </div>
+    <script>
+            document.getElementById('inputFoto').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Cambia la fuente de la imagen de manera instantánea por la seleccionada
+                        document.getElementById('fotoPreview').src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+    </script>
 </body>
 </html>
