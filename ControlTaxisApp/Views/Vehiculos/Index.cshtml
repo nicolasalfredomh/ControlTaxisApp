@@ -46,6 +46,7 @@
                             <th>Id</th>
                             <th>Placa</th>
                             <th>Modelo / Marca</th>
+                            <th>HV</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -58,6 +59,11 @@
                                     <td>@item.Id</td>
                                     <td><span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">@item.Placa</span></td>
                                     <td>@item.Modelo</td>
+                                    <td>
+                                        <a asp-controller="Conductores" asp-action="HojaDeVida" asp-route-vehiculoId="@item.Id" class="btn btn-sm btn-info text-white fw-bold" title="Ver Hoja de Vida">
+                                            <i class="fa-solid fa-id-card"></i> HV
+                                        </a>
+                                    </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center align-items-center gap-2">
                                             <a asp-action="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
