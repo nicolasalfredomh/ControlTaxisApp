@@ -25,7 +25,7 @@ namespace ControlTaxisApp.Controllers
                                  .AnyAsync(v => v.Id == vehiculoId && v.UsuarioId == _userId);
         }
 
-        public async Task<IActionResult> Index(string? placaFiltro, int? tipoId)
+        public async Task<IActionResult> Index(string? placaFiltro, int? tipoId, int? mes, DateTime? fechaDesde, DateTime? fechaHasta)
         {
             var query = _context.Mantenimientos
                    .Include(m => m.IdVehiculoNavigation)
@@ -41,7 +41,23 @@ namespace ControlTaxisApp.Controllers
             {
                 query = query.Where(m => m.TipoMantenimientoId == tipoId);
             }
+            // Filtro por Mes específico
+            if (mes.HasValue && mes.Value > 0 && mes.Value <= 12)
+            {
+                query = query.Where(m => m.Fecha.Month == mes.Value);
+            }
 
+            // Filtro por Rango de Fechas (Desde)
+            if (fechaDesde.HasValue)
+            {
+                query = query.Where(m => m.Fecha.Date >= fechaDesde.Value.Date);
+            }
+
+            // Filtro por Rango de Fechas (Hasta)
+            if (fechaHasta.HasValue)
+            {
+                query = query.Where(m => m.Fecha.Date <= fechaHasta.Value.Date);
+            }
             // 4. Preparar datos para los selects
             ViewBag.TiposFiltro = await _context.TiposMantenimiento.ToListAsync();
 

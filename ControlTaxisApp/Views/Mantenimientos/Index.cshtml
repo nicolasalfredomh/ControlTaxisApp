@@ -63,7 +63,34 @@
                     }
                 </select>
             </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold small text-muted">Mes:</label>
+                <select name="mes" class="form-select form-select-sm">
+                    <option value="">-- Todos los Meses --</option>
+                    <option value="1" selected="@(Context.Request.Query["mes"] == "1")">Enero</option>
+                    <option value="2" selected="@(Context.Request.Query["mes"] == "2")">Febrero</option>
+                    <option value="3" selected="@(Context.Request.Query["mes"] == "3")">Marzo</option>
+                    <option value="4" selected="@(Context.Request.Query["mes"] == "4")">Abril</option>
+                    <option value="5" selected="@(Context.Request.Query["mes"] == "5")">Mayo</option>
+                    <option value="6" selected="@(Context.Request.Query["mes"] == "6")">Junio</option>
+                    <option value="7" selected="@(Context.Request.Query["mes"] == "7")">Julio</option>
+                    <option value="8" selected="@(Context.Request.Query["mes"] == "8")">Agosto</option>
+                    <option value="9" selected="@(Context.Request.Query["mes"] == "9")">Septiembre</option>
+                    <option value="10" selected="@(Context.Request.Query["mes"] == "10")">Octubre</option>
+                    <option value="11" selected="@(Context.Request.Query["mes"] == "11")">Noviembre</option>
+                    <option value="12" selected="@(Context.Request.Query["mes"] == "12")">Diciembre</option>
+                </select>
+            </div>
 
+            <div class="col-md-2">
+                <label class="form-label fw-bold small text-muted">Desde:</label>
+                <input type="date" name="fechaDesde" value="@Context.Request.Query["fechaDesde"]" class="form-control form-control-sm" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-bold small text-muted">Hasta:</label>
+                <input type="date" name="fechaHasta" value="@Context.Request.Query["fechaHasta"]" class="form-control form-control-sm" />
+            </div>
             <div class="col-auto d-flex gap-2">
                 <button type="submit" class="btn btn-primary btn-sm">
                     <i class="fa-solid fa-filter"></i> Filtrar
@@ -73,7 +100,6 @@
                     <i class="fa-solid fa-file-excel"></i> Generar Reporte
                 </button> *@
 
-                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Limpiar</a>
             </div>
         </form>
         <div class="card shadow-sm p-4">
@@ -126,18 +152,13 @@
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                    <tfoot class="table-secondary fw-bold">
-                        <tr>
-                            <td colspan="2" class="text-end">TOTALES</td>
-                            <td></td>
-                             <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>$@Model.Sum(x => x.Valor).ToString("N0")</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
+                        <tfoot class="table-secondary fw-bold">
+                            <tr>
+                                <td colspan="7" class="text-end">TOTALES:</td>
+                                <td class="text-danger">$@Model.Sum(x => x.Valor).ToString("N0")</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
                 </table>
             </div>
         </div>

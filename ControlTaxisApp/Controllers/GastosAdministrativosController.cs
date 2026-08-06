@@ -25,7 +25,7 @@ namespace ControlTaxisApp.Controllers
             return await _context.Vehiculos.AnyAsync(v => v.Placa == placa && v.UsuarioId == UserId);
         }
 
-        public async Task<IActionResult> Index(string? placaFiltro, string? categoriaFiltro)
+        public async Task<IActionResult> Index(string? placaFiltro, string? categoriaFiltro, int? mes, DateTime? fechaDesde, DateTime? fechaHasta)
         {
             var query = _context.GastosAdministrativos
                                 .Where(g => _context.Vehiculos.Any(v => v.Placa == g.Placa && v.UsuarioId == UserId))
@@ -33,6 +33,23 @@ namespace ControlTaxisApp.Controllers
 
             if (!string.IsNullOrEmpty(placaFiltro)) query = query.Where(g => g.Placa == placaFiltro);
             if (!string.IsNullOrEmpty(categoriaFiltro)) query = query.Where(g => g.Concepto == categoriaFiltro);
+            // Filtro por Mes específico
+            if (mes.HasValue && mes.Value > 0 && mes.Value <= 12)
+            {
+                query = query.Where(g => g.Fecha.Month == mes.Value);
+            }
+
+            // Filtro por Rango de Fechas (Desde)
+            if (fechaDesde.HasValue)
+            {
+                query = query.Where(g => g.Fecha.Date >= fechaDesde.Value.Date);
+            }
+
+            // Filtro por Rango de Fechas (Hasta)
+            if (fechaHasta.HasValue)
+            {
+                query = query.Where(g => g.Fecha.Date <= fechaHasta.Value.Date);
+            }
 
             var listaGastos = await query.OrderByDescending(g => g.Fecha).AsNoTracking().ToListAsync();
 
