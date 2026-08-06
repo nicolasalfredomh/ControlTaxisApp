@@ -13,9 +13,11 @@ RUN dotnet publish -c Release -o /app
 # 2. Etapa de ejecución
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 
-# --- CORRECCIÓN AQUÍ: Instalamos sqlite3 ---
-# Instalamos sqlite3 y limpiamos la caché de apt para reducir el tamaño de la imagen
-RUN apt-get update && apt-get install -y sqlite3 && rm -rf /var/lib/apt/lists/*
+# --- CORRECCIÓN AQUÍ: Instalamos sqlite3 Y libgdiplus ---
+# libgdiplus es indispensable para System.Drawing en entornos Linux
+RUN apt-get update && \
+    apt-get install -y sqlite3 libgdiplus && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=build /app .
