@@ -114,14 +114,14 @@ namespace ControlTaxisApp.Services
 
                         filaActual++;
                     }
-                    // 3. Totales del mes con punto y coma (;) para formato en español
+                    // 3. Totales del mes con la función universal SUM y comas
                     ws.Cells[filaActual, 2].Value = "TOTAL MES";
-                    ws.Cells[filaActual, 3].Formula = $"SUMA(C{inicioDatos}:C{filaActual - 1})";
-                    ws.Cells[filaActual, 4].Formula = $"SUMA(D{inicioDatos}:D{filaActual - 1})";
-                    ws.Cells[filaActual, 6].Formula = $"SUMA(F{inicioDatos}:F{filaActual - 1})";
+                    ws.Cells[filaActual, 3].Formula = $"SUM(C{inicioDatos}:C{filaActual - 1})";
+                    ws.Cells[filaActual, 4].Formula = $"SUM(D{inicioDatos}:D{filaActual - 1})";
+                    ws.Cells[filaActual, 6].Formula = $"SUM(F{inicioDatos}:F{filaActual - 1})";
                     ws.Cells[filaActual, 2, filaActual, 6].Style.Font.Bold = true;
 
-                    // Forzar a EPPlus a calcular el valor para que aparezca visible de inmediato
+                    // Forzar el cálculo en el servidor
                     ws.Calculate();
 
                     for (int col = 1; col <= 8; col++)
