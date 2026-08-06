@@ -44,7 +44,7 @@ namespace ControlTaxisApp.Controllers
         // POST: Conductores/GuardarHojaDeVida
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GuardarHojaDeVida(Conductor model, IFormFile? archivoFoto)
+        public async Task<IActionResult> GuardarHojaDeVida(Conductor model, IFormFile? archivoFoto, IFormFile? archivoLicenciaFrente, IFormFile? archivoLicenciaAtras)
         {
             if (model.VehiculoId == null) return NotFound();
 
@@ -52,12 +52,12 @@ namespace ControlTaxisApp.Controllers
             var vehiculo = await _context.Vehiculos.FirstOrDefaultAsync(v => v.Id == model.VehiculoId && v.UsuarioId == _userId);
             if (vehiculo == null) return Forbid();
 
-            // 1. Gestión de la fotografía
+            string carpetaFOTOS = Path.Combine(_env.WebRootPath, "images", "conductores");
+            if (!Directory.Exists(carpetaFOTOS)) Directory.CreateDirectory(carpetaFOTOS);
+
+            // 1. Gestión de la fotografía principal del conductor
             if (archivoFoto != null && archivoFoto.Length > 0)
             {
-                string carpetaFOTOS = Path.Combine(_env.WebRootPath, "images", "conductores");
-                if (!Directory.Exists(carpetaFOTOS)) Directory.CreateDirectory(carpetaFOTOS);
-
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(archivoFoto.FileName);
                 string filePath = Path.Combine(carpetaFOTOS, fileName);
 
@@ -69,36 +69,79 @@ namespace ControlTaxisApp.Controllers
                 model.FotoUrl = "/images/conductores/" + fileName;
             }
 
-            // 2. Buscar si ya existe un conductor para este vehículo en la Base de Datos
+            // 2. Gestión de la foto de la licencia (Frente)
+            if (archivoLicenciaFrente != null && archivoLicenciaFrente.Length > 0)
+            {
+                string fileNameFrente = "frente_" + Guid.NewGuid().ToString() + Path.GetExtension(archivoLicenciaFrente.FileName);
+                string filePathFrente = Path.Combine(carpetaFOTOS, fileNameFrente);
+
+                using (var stream = new FileStream(filePathFrente, FileMode.Create))
+                {
+                    await archivoLicenciaFrente.CopyToAsync(stream);
+                }
+
+                model.LicenciaFrenteUrl = "/images/conductores/" + fileNameFrente;
+            }
+
+            // 3. Gestión de la foto de la licencia (Atrás)
+            if (archivoLicenciaAtras != null && archivoLicenciaAtras.Length > 0)
+            {
+                string fileNameAtras = "atras_" + Guid.NewGuid().ToString() + Path.GetExtension(archivoLicenciaAtras.FileName);
+                string filePathAtras = Path.Combine(carpetaFOTOS, fileNameAtras);
+
+                using (var stream = new FileStream(filePathAtras, FileMode.Create))
+                {
+                    await archivoLicenciaAtras.CopyToAsync(stream);
+                }
+
+                model.LicenciaAtrasUrl = "/images/conductores/" + fileNameAtras;
+            }
+
+            // 4. Buscar si ya existe un conductor para este vehículo en la Base de Datos
             var conductorExistente = await _context.Conductores.FirstOrDefaultAsync(c => c.VehiculoId == model.VehiculoId);
 
             if (conductorExistente != null)
             {
-                // Si ya existe, actualizamos sus propiedades para no depender únicamente del ID del formulario
+                // Actualizar datos personales y de contacto
                 conductorExistente.Nombre = model.Nombre;
                 conductorExistente.Apellidos = model.Apellidos;
                 conductorExistente.Telefono = model.Telefono;
                 conductorExistente.Direccion = model.Direccion;
                 conductorExistente.Activo = model.Activo;
 
+                conductorExistente.ContactoNombre = model.ContactoNombre;
+                conductorExistente.ContactoApellidos = model.ContactoApellidos;
+                conductorExistente.ContactoCorreo = model.ContactoCorreo;
+                conductorExistente.ContactoTelefono = model.ContactoTelefono;
+
+                // Conservar o actualizar imágenes según corresponda
                 if (!string.IsNullOrEmpty(model.FotoUrl))
                 {
-                    conductorExistente.FotoUrl = model.FotoUrl; // Solo reemplazamos si subió una nueva foto
+                    conductorExistente.FotoUrl = model.FotoUrl;
+                }
+                if (!string.IsNullOrEmpty(model.LicenciaFrenteUrl))
+                {
+                    conductorExistente.LicenciaFrenteUrl = model.LicenciaFrenteUrl;
+                }
+                if (!string.IsNullOrEmpty(model.LicenciaAtrasUrl))
+                {
+                    conductorExistente.LicenciaAtrasUrl = model.LicenciaAtrasUrl;
                 }
 
                 _context.Conductores.Update(conductorExistente);
             }
             else
             {
-                // Si no existe ninguno, lo agregamos como nuevo
+                // Agregar como nuevo registro
                 _context.Conductores.Add(model);
             }
 
             await _context.SaveChangesAsync();
             TempData["Mensaje"] = "¡Hoja de vida guardada con éxito!";
 
-            // Redirige de vuelta a la lista de vehículos o donde prefieras
             return RedirectToAction("Index", "Vehiculos");
         }
+
+
     }
 }

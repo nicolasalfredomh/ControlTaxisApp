@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 </head>
 <body class="bg-light">
-    <div class="container my-5" style="max-width: 700px;">
+    <div class="container my-5" style="max-width: 900px;">
         <div class="card shadow-sm border-start border-primary border-5">
             <div class="card-body p-4">
                 <h3 class="fw-bold text-secondary mb-1">
@@ -25,48 +25,95 @@
                     <input type="hidden" asp-for="Id" />
                     <input type="hidden" asp-for="VehiculoId" />
                     <input type="hidden" asp-for="FotoUrl" />
+                    <input type="hidden" asp-for="LicenciaFrenteUrl" />
+                    <input type="hidden" asp-for="LicenciaAtrasUrl" />
 
+                    <!-- SECCIÓN 1: DATOS PERSONALES Y FOTO -->
+                    <h5 class="text-primary fw-bold mb-3"><i class="fa-solid fa-user me-2"></i>Información Personal</h5>
                     <div class="row align-items-center mb-4">
                         <div class="col-md-4 text-center">
                             <div class="mb-2">
-                                @if (!string.IsNullOrEmpty(Model.FotoUrl))
-                                {
-                                    <!-- Agregamos id="fotoPreview" -->
-                                    <img id="fotoPreview" src="@Model.FotoUrl" alt="Foto Conductor" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" />
-                                }
-                                else
-                                {
-                                    <!-- Agregamos id="fotoPreview" -->
-                                    <img id="fotoPreview" src="https://via.placeholder.com/120?text=Sin+Foto" alt="Sin Foto" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" />
-                                }
+                                <img id="fotoPreview" src="@(!string.IsNullOrEmpty(Model.FotoUrl) ? Model.FotoUrl : "https://via.placeholder.com/120?text=Sin+Foto")" alt="Foto Conductor" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" />
                             </div>
                             <label class="btn btn-outline-secondary btn-sm">
-                                <!-- Agregamos id="inputFoto" -->
                                 <i class="fa-solid fa-camera"></i> Subir Foto
                                 <input type="file" id="inputFoto" name="archivoFoto" class="d-none" accept="image/*" />
                             </label>
                         </div>
                         <div class="col-md-8">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Nombres</label>
-                                <input asp-for="Nombre" class="form-control" required placeholder="Ej: Carlos Alberto" />
-                                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Nombres</label>
+                                    <input asp-for="Nombre" class="form-control" required placeholder="Ej: Carlos Alberto" />
+                                    <span asp-validation-for="Nombre" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Apellidos</label>
+                                    <input asp-for="Apellidos" class="form-control" placeholder="Ej: Pérez Gómez" />
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Apellidos</label>
-                                <input asp-for="Apellidos" class="form-control" placeholder="Ej: Pérez Gómez" />
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Teléfono / Celular</label>
+                                    <input asp-for="Telefono" class="form-control" placeholder="Ej: 3101234567" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Dirección</label>
+                                    <input asp-for="Direccion" class="form-control" placeholder="Ej: Calle 10 # 20-30" />
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <hr class="my-4" />
+
+                    <!-- SECCIÓN 2: CONTACTO DE EMERGENCIA -->
+                    <h5 class="text-primary fw-bold mb-3"><i class="fa-solid fa-address-book me-2"></i>Contacto de Emergencia</h5>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Teléfono / Celular</label>
-                            <input asp-for="Telefono" class="form-control" placeholder="Ej: 3101234567" />
+                            <label class="form-label fw-bold">Nombres de Contacto</label>
+                            <input asp-for="ContactoNombre" class="form-control" placeholder="Ej: María" />
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Dirección</label>
-                            <input asp-for="Direccion" class="form-control" placeholder="Ej: Calle 10 # 20-30" />
+                            <label class="form-label fw-bold">Apellidos de Contacto</label>
+                            <input asp-for="ContactoApellidos" class="form-control" placeholder="Ej: Gómez" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Correo Electrónico</label>
+                            <input asp-for="ContactoCorreo" type="email" class="form-control" placeholder="Ej: correo@example.com" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Número de Teléfono</label>
+                            <input asp-for="ContactoTelefono" class="form-control" placeholder="Ej: 3209876543" />
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <!-- SECCIÓN 3: FOTOS DE LA LICENCIA -->
+                    <h5 class="text-primary fw-bold mb-3"><i class="fa-solid id-card-clip me-2"></i>Fotografía de la Licencia (Conducción)</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 text-center">
+                            <label class="form-label fw-bold d-block">Licencia - Frente</label>
+                            <div class="mb-2">
+                                <img id="licenciaFrentePreview" src="@(!string.IsNullOrEmpty(Model.LicenciaFrenteUrl) ? Model.LicenciaFrenteUrl : "https://via.placeholder.com/250x150?text=Licencia+Frente")" alt="Licencia Frente" class="img-thumbnail rounded" style="width: 100%; max-height: 160px; object-fit: cover;" />
+                            </div>
+                            <label class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="fa-solid fa-upload"></i> Subir Frente
+                                <input type="file" id="inputLicenciaFrente" name="archivoLicenciaFrente" class="d-none" accept="image/*" />
+                            </label>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <label class="form-label fw-bold d-block">Licencia - Atrás</label>
+                            <div class="mb-2">
+                                <img id="licenciaAtrasPreview" src="@(!string.IsNullOrEmpty(Model.LicenciaAtrasUrl) ? Model.LicenciaAtrasUrl : "https://via.placeholder.com/250x150?text=Licencia+Atras")" alt="Licencia Atrás" class="img-thumbnail rounded" style="width: 100%; max-height: 160px; object-fit: cover;" />
+                            </div>
+                            <label class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="fa-solid fa-upload"></i> Subir Atrás
+                                <input type="file" id="inputLicenciaAtras" name="archivoLicenciaAtras" class="d-none" accept="image/*" />
+                            </label>
                         </div>
                     </div>
 
@@ -83,18 +130,25 @@
             </div>
         </div>
     </div>
+
+    <!-- Scripts de Previsualización Instantánea -->
     <script>
-            document.getElementById('inputFoto').addEventListener('change', function(event) {
+        function previsualizarImagen(inputId, previewId) {
+            document.getElementById(inputId).addEventListener('change', function(event) {
                 const file = event.target.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        // Cambia la fuente de la imagen de manera instantánea por la seleccionada
-                        document.getElementById('fotoPreview').src = e.target.result;
+                        document.getElementById(previewId).src = e.target.result;
                     }
                     reader.readAsDataURL(file);
                 }
             });
+        }
+
+        previsualizarImagen('inputFoto', 'fotoPreview');
+        previsualizarImagen('inputLicenciaFrente', 'licenciaFrentePreview');
+        previsualizarImagen('inputLicenciaAtras', 'licenciaAtrasPreview');
     </script>
 </body>
 </html>
