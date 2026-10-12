@@ -81,11 +81,14 @@ namespace ControlTaxisApp.Controllers
                 mantenimientosQuery = mantenimientosQuery.Where(m => m.Fecha.Month == mes);
                 gastosQuery = gastosQuery.Where(g => g.Fecha.Month == mes);
             }
-
+            if (!string.IsNullOrEmpty(estadoFiltro) && estadoFiltro != "Todos")
+            {
+                liquidacionesQuery = liquidacionesQuery.Where(l => l.EstadoDia == estadoFiltro);
+            }
             // 5. Ejecutar consultas
             model.Liquidaciones = await liquidacionesQuery.ToListAsync();
             model.Mantenimientos = await mantenimientosQuery.ToListAsync();
-            model.GastosAdministrativos = await gastosQuery.ToListAsync(); 
+            model.GastosAdministrativos = await gastosQuery.ToListAsync();
 
             // 6. Lógica de tipo día (se mantiene igual para las liquidaciones)
             if (!string.IsNullOrEmpty(tipoDiaFiltro) && tipoDiaFiltro != "Todos")
@@ -97,6 +100,8 @@ namespace ControlTaxisApp.Controllers
                 else if (tipoDiaFiltro == "Habil")
                     model.Liquidaciones = model.Liquidaciones.Where(l => l.Fecha.DayOfWeek != DayOfWeek.Sunday && !listaFestivos.Contains(l.Fecha.Date)).ToList();
             }
+
+          
 
             return View(model);
         }

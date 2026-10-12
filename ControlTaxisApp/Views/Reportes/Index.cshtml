@@ -53,6 +53,7 @@
                 <option value="PICO_Y_PLACA">Pico y Placa</option>
                 <option value="TALLER">Taller</option>
                 <option value="DESCANSO">Descanso</option>
+                <option value="PATIOS">Patios</option>
             </select>
             </div>
 
@@ -159,6 +160,9 @@
                                 case "PICO_Y_PLACA":
                                     filaClase = "table-warning";
                                     break;
+                                case "PATIOS":
+                                    filaClase = "table-warning";
+                                    break;
                             }
                         }
                         <tr class="@filaClase" style="@estiloFila">
@@ -217,6 +221,10 @@
                                     case "PICO_Y_PLACA":
 
                                         <span class="badge bg-warning text-dark">PICO Y PLACA</span>
+                                        break;
+                                    case "PATIOS":
+
+                                        <span class="badge bg-warning text-dark">PATIOS</span>
                                         break;
                                     default:
 
